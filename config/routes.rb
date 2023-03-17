@@ -10,4 +10,5 @@ Rails.application.routes.draw do
   get 'houses/search', to: 'house#search', as: 'search_houses'
   resources :houses
   get '/test', to: 'house#test'
+  get '/property-grid', to: 'house#property'
 end
