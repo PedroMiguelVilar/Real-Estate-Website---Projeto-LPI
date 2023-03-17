@@ -1,0 +1,30 @@
+<h1>All Houses</h1>
+
+<table>
+  <tr>
+    <th><%= sortable "Id" %></th>
+    <th><%= sortable "Title" %></th>
+    <th><%= sortable "Type" %></th>
+    <th><%= sortable "Situacao" %></th>
+    <th><%= sortable "Condicao" %></th>
+    <th><%= sortable "Price" %></th>
+    <th>Localizacao</th>
+  </tr>
+  <% @houses.each do |house| %>
+    <tr>
+      <td><%= house.Id %></td>
+      <td><%= house.Title %></td>
+      <td><%= house.Type %></td>
+      <td><%= house.Situacao %></td>
+      <td><%= house.Condicao %></td>
+      <% if house.Price == ""%>
+      <td>Not Listed</td>
+      <% else %>
+      <td><%= house.Price %></td>
+      <% end %>
+      <td><%= house.Localizacao %></td>
+    </tr>
+  <% end %>
+</table>
+
+<%= will_paginate @houses %>

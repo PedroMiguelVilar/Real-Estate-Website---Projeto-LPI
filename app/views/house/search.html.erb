@@ -1,0 +1,161 @@
+
+<body>
+<%= form_tag search_houses_path, method: :get, autocomplete: "off" do %>
+  <%= text_field_tag :search, params[:search], id: "search", spellcheck: false, placeholder: "Search by localizacao", data: { source: search_suggestions_path } %>
+  <%= select_tag :situacao, options_for_select([['For Rent', 'alugar'], ['For Sale', 'comprar']], params[:situacao]), include_blank: false %>
+  <%= select_tag :type, options_for_select([['Moradia', 'moradias'], ['Apartamento', 'apartamentos']], params[:type]), include_blank: false %>
+  <%= check_box_tag 'total_quartos[]', '0', params[:total_quartos]&.include?('0') %> T0
+  <%= check_box_tag 'total_quartos[]', '1', params[:total_quartos]&.include?('1') %> T1
+  <%= check_box_tag 'total_quartos[]', '2', params[:total_quartos]&.include?('2') %> T2
+  <%= check_box_tag 'total_quartos[]', '3', params[:total_quartos]&.include?('3') %> T3
+  <%= check_box_tag 'total_quartos[]', '4', params[:total_quartos]&.include?('4') %> T4
+  <%= check_box_tag 'total_quartos[]', '5', params[:total_quartos]&.include?('5') %> T5
+  <%= check_box_tag 'total_quartos[]', '6', params[:total_quartos]&.include?('6') %> T6
+
+  <%= text_field_tag :min_price, params[:min_price], placeholder: "Minimum Price"%>
+  <%= text_field_tag :max_price, params[:max_price], placeholder: "Maximum Price"%>
+
+  <div class="ui-autocomplete-input" id="suggestions"></div>
+  <%= submit_tag "Search" %>
+<% end %>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<%= javascript_include_tag 'search' %>
+
+<% if @houses.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= sortable "Id" %></th>
+        <th><%= sortable "Title" %></th>
+        <th>Localizacao</th>
+        <th>Situacao</th>
+        <th>Type</th>
+        <th><%= sortable "Price"%></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @houses.each do |house| %>
+        <tr>
+          <td><%= house.Id %></td>
+          <td><a href = "<%= house.Url %>"><%= house.Title %></a></td>
+          <td><%= house.Localizacao %></td>
+          <td><%= house.Situacao %></td>
+          <td><%= house.Type %></td>
+          <td><%= house.Price %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No results found.</p>
+<% end %>
+
+<%= will_paginate @houses %>
+
+
+    <style>
+      #map {
+        width: 100%;
+        height: 600px;
+      }
+    </style>
+
+    
+  <div id="map"></div>
+<%= javascript_include_tag 'leaflet' %>
+<%= javascript_include_tag 'leaflet.draw' %>
+<%= javascript_include_tag 'populate_selectedmarkers' %>
+
+<table id="selected-markers-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+
+<script>
+
+  var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>'},    <% end %>  ];
+
+  var mymap = L.map('map').setView([38.736946, -9.142685], 6);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    maxZoom: 18
+  }).addTo(mymap);
+
+  for (var i = 0; i < houseMarkers.length; i++) {
+    var marker = L.marker([houseMarkers[i].Latitude, houseMarkers[i].Longitude], {
+      icon: L.icon({
+        iconUrl: '/img/marker-icon.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [0, -35]
+      })
+    });
+
+    var popupContent = "";
+    for (var j = 0; j < houseMarkers.length; j++) {
+      if (houseMarkers[j].Latitude == houseMarkers[i].Latitude &&
+          houseMarkers[j].Longitude == houseMarkers[i].Longitude) {
+        popupContent += "<a href='" + houseMarkers[j].Url + "'>" + houseMarkers[j].Title + "</a><br>";
+      }
+    }
+
+    marker.bindPopup(popupContent).addTo(mymap);
+  }
+
+  var drawnItems = new L.FeatureGroup();
+  mymap.addLayer(drawnItems);
+
+var drawControl = new L.Control.Draw({
+    edit: {
+        featureGroup: drawnItems
+    },
+    draw: {
+        polyline: true,
+        polygon: true,
+        rectangle: true,
+        marker: true,
+        circlemarker: false,
+        circle: false
+    }
+});
+
+
+  mymap.addControl(drawControl);
+
+  mymap.on(L.Draw.Event.CREATED, function(event) {
+    var layer = event.layer;
+    drawnItems.addLayer(layer);
+
+    var bounds = layer.getBounds();
+    var selectedMarkers = houseMarkers.filter(function(marker) {
+      var latlng = L.latLng(marker.Latitude, marker.Longitude);
+      return bounds.contains(latlng);
+    });
+
+    var popupContent = "";
+    for (var i = 0; i < selectedMarkers.length; i++) {
+      popupContent += "<a href='" + selectedMarkers[i].Url + "'>" + selectedMarkers[i].Title + "</a><br>";
+    }
+
+    L.popup()
+      .setLatLng(bounds.getCenter())
+      .setContent(popupContent)
+      .openOn(mymap);
+
+    populateSelectedMarkersTable(selectedMarkers);
+  });
+
+</script>
+
+<script>
+</body>
