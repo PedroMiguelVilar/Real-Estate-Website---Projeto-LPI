@@ -1,4 +1,4 @@
-<body>
+
   <%= form_tag search_houses_path, method: :get, autocomplete: "off" do %>
     <%= text_field_tag :search, params[:search], id: "search", spellcheck: false, placeholder: "Search by localizacao", data: { source: search_suggestions_path } %>
     <%= select_tag :situacao, options_for_select([['For Rent', 'alugar'], ['For Sale', 'comprar']], params[:situacao]), include_blank: false %>
@@ -191,8 +191,12 @@
         .setContent(popupContent)
         .openOn(mymap);
 
+      mymap.on('draw:deleted', function () {
+        drawnItems.clearLayers();
+        document.getElementById("selected-markers-table").getElementsByTagName("tbody")[0].innerHTML = "";
+      });
+
       populateSelectedMarkersTable(selectedMarkers);
     });
   </script>
   <script>
-  </body>
