@@ -6,7 +6,7 @@ function populateSelectedMarkersTable(selectedMarkers) {
     var priceCell = row.insertCell(1);
     var locationCell = row.insertCell(2);
     var link = document.createElement("a"); 
-    link.href = selectedMarkers[i].Url; 
+    link.href = '/property_single.' +  selectedMarkers[i].Id;
     link.innerHTML = selectedMarkers[i].Title; 
     nameCell.appendChild(link); 
     priceCell.innerHTML = selectedMarkers[i].Price;

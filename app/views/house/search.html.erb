@@ -120,6 +120,7 @@
     <tbody>
     </tbody>
   </table>
+  
   <script>
     var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>'},    <% end %>  ];
 
@@ -199,4 +200,3 @@
       populateSelectedMarkersTable(selectedMarkers);
     });
   </script>
-  <script>

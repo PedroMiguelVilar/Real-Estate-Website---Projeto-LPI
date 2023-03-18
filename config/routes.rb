@@ -7,8 +7,16 @@ Rails.application.routes.draw do
   get '/index', to: 'house#index'
   get '/contact', to: 'house#contact'
   get '/about', to: 'house#about'
-  get 'houses/search', to: 'house#search', as: 'search_houses'
-  resources :houses
-  get '/test', to: 'house#test'
-  get '/property-grid', to: 'house#property'
+  #get 'houses/search', to: 'house#search'
+  get '/property-grid', to: 'house#property_grid', as: 'search_houses'
+  get '/property_single', to: 'house#property_single'
+
+
+  resources :houses do
+    member do
+      get 'property_single/:id', to: 'house#property_single', as: 'property_single'
+    end
+  end
+  
+  
 end
