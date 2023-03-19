@@ -127,11 +127,12 @@ class HouseController < ApplicationController
     #end
 
     def property_single
-      @house = House.find(params[:format])
+      @house = House.find(params[:format])    
+      @image_urls = PagesController.new.scrape_single(@house)
     end
 
     
-    helper_method :sort_column, :sort_direction
+      helper_method :sort_column, :sort_direction
       def property_grid
         query_params = {}
         query_params[:Situacao] = params[:situacao] if params[:situacao].present?
@@ -246,6 +247,9 @@ class HouseController < ApplicationController
         @houses = House.none.paginate(page: params[:page], per_page: 9)
         @houses_map = []
       end
+
+      @image_urls = PagesController.new.scrape(@houses)
+
     end
     
     private

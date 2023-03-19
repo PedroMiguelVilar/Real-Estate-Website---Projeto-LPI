@@ -229,12 +229,15 @@
           </div>
         </div>
         <% if @houses.any? %>
-          <% @houses.each do |house| %>
+          <% @houses.each_with_index do |house, i| %>
             <div class="col-md-4">
               <div class="card-box-a card-shadow">
                 <div class="img-box-a">
-                  <%property_number = rand(1..10)%>
-                  <img src="img/property-<%= property_number%>.jpg" alt="" class="img-a img-fluid">
+                  <% if @image_urls[i] %>
+                    <img src="<%= @image_urls[i] %>" width="350" height="350" alt="" class="img-a img-fluid" style="width: 350px !important; height: 350px !important;">
+                  <% else %>
+                    <img src="img/house-default.jpg" alt="" width="560" height="560" class="img-a img-fluid">
+                  <% end %>
                 </div>
                 <div class="card-overlay">
                   <div class="card-overlay-a-content">

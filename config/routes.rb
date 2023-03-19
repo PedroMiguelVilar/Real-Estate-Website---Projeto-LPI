@@ -18,5 +18,6 @@ Rails.application.routes.draw do
     end
   end
   
+  get '/scrape', to: 'pages#scrape'
   
 end
