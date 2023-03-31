@@ -219,6 +219,7 @@
   </section>
   <!--/ Intro Single End /-->
   <!--/ Property Single Star /-->
+
   <section class="property-single nav-arrow-b">
     <div class="container">
       <div class="row">
@@ -276,6 +277,18 @@
                         <span>Comprar</span>
                       <%end%>
                     </li>
+                    <% if @averages_single.present? %>
+                      <li class="d-flex justify-content-between">
+                        <strong>Preço Médio da Localização:</strong>
+                        <span><%= @averages_single%> €</span>
+                      </li>
+                    <%end%>
+                    <% if @house.Price_per_Area.present? %>
+                      <li class="d-flex justify-content-between">
+                        <strong>Preço/Area:</strong>
+                        <span><%= @house.Price_per_Area%> €</span>
+                      </li>
+                    <%end%>
                     <% if @house.Ano_de_Construcao.present? %>
                       <li class="d-flex justify-content-between">
                         <strong>Condicao:</strong>

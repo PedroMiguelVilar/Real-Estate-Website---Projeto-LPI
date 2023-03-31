@@ -58,6 +58,13 @@ class PagesController < ApplicationController
         doc = Nokogiri::HTML(html)
   
         # Extract the URL of the first image from the HTML using CSS selectors
+        source = doc.css('picture.property-photos source').first
+        if source && source['srcset']
+          image_url = source['srcset'].split(' ').first
+          images << image_url
+        end
+        
+        # Extract the URL of the first image from the HTML using CSS selectors
         property_photos = doc.css('.property-photos')
         property_photos.each do |elem|
           img_src = elem.css('source').first['data-srcset']

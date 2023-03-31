@@ -228,6 +228,7 @@
             </form>
           </div>
         </div>
+        
         <% if @houses.any? %>
           <% @houses.each_with_index do |house, i| %>
             <div class="col-md-4">
@@ -341,7 +342,7 @@
       for (var j = 0; j < houseMarkers.length; j++) {
         if (houseMarkers[j].Latitude == houseMarkers[i].Latitude &&
             houseMarkers[j].Longitude == houseMarkers[i].Longitude) {
-          popupContent += "<a href='" + houseMarkers[j].Url + "'>" + houseMarkers[j].Title + "</a>";
+          popupContent += "<a href='" + houseMarkers[j].Url + "'>" + houseMarkers[j].Title + "</a><br>";
         }
       }
 
