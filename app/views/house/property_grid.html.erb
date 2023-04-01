@@ -212,23 +212,40 @@
     </div>
   </section>
   <!--/ Intro Single End /-->
+  <style>
+    #map {
+      width: 100%;
+      height: 600px;
+    }
+  </style>
+  <div id="map"></div>
   <!--/ Property Grid Star /-->
   <section class="property-grid grid">
-    <div class="container">
+    <div class="container" id ="property-grid">
       <div class="row">
         <div class="col-sm-12">
           <div class="grid-option">
-            <form>
-              <select class="custom-select">
-                <option selected>All</option>
-                <option value="1">New to Old</option>
-                <option value="2">For Rent</option>
-                <option value="3">For Sale</option>
+            <form id="search-form">
+              <select class="custom-select" id="sort-by">
+                <option selected disabled hidden>Sort by</option>
+                <option value="Price <%= params[:sort_direction] == "asc" ? "desc" : "asc" %>">Price <%= params[:sort_direction] == "asc" ? "↓" : "↑" %></option>
+                <option value="Ano_de_Contrucao <%= params[:sort_direction] == "asc" ? "desc" : "asc" %>">Newest <%= params[:sort_direction] == "asc" ? "↓" : "↑" %></option>
               </select>
             </form>
           </div>
+          <script>
+            $(document).ready(function() {
+              console.log("sort function executing");
+              $('#sort-by').on('change', function() {
+                var urlParams = new URLSearchParams(window.location.search);
+                var sortOption = $(this).val();
+                urlParams.set('sort_column', sortOption.split(' ')[0]);
+                urlParams.set('sort_direction', sortOption.split(' ')[1]);
+                window.location.search = urlParams.toString();
+              });
+            });
+          </script>
         </div>
-        
         <% if @houses.any? %>
           <% @houses.each_with_index do |house, i| %>
             <div class="col-md-4">
@@ -295,292 +312,303 @@
         </div>
       </div>
     </div>
-  </section>
-  <!--/ Property Grid End /-->
-  <style>
-    #map {
-      width: 100%;
-      height: 600px;
-    }
-  </style>
-  <div id="map"></div>
-  <%= javascript_include_tag 'leaflet' %>
-  <%= javascript_include_tag 'leaflet.draw' %>
-  <%= javascript_include_tag 'populate_selectedmarkers' %>
-  <table id="selected-markers-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Location</th>
-      </tr>
-    </thead>
+    <style>
+      .center {
+        margin: 0 auto;
+      }
+    </style>
+    <table id="selected-markers-table" class="center">
+      <tbody>
+      </tbody>
+    </table>
     <tbody>
     </tbody>
   </table>
-  <script>
-    var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>', Id:  '<%= house.Id %>'},    <% end %>  ];
+</section>
+<!--/ Property Grid End /-->
+<%= javascript_include_tag 'leaflet' %>
+<%= javascript_include_tag 'leaflet.draw' %>
+<%= javascript_include_tag 'populate_selectedmarkers' %>
+<script>
+  var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>', Id:  '<%= house.Id %>', Area_Util:  '<%= house.Area_Util %>', Total_quartos:  '<%= house.Total_quartos %>', Condicao:  '<%= house.Condicao %>', Situacao:  '<%= house.Situacao %>'},    <% end %>  ];
 
-    var mymap = L.map('map').setView([38.736946, -9.142685], 6);
+  var mymap = L.map('map').setView([38.736946, -9.142685], 6);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-      maxZoom: 18
-    }).addTo(mymap);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    maxZoom: 18
+  }).addTo(mymap);
 
-    for (var i = 0; i < houseMarkers.length; i++) {
-      var marker = L.marker([houseMarkers[i].Latitude, houseMarkers[i].Longitude], {
-        icon: L.icon({
-          iconUrl: '/img/marker-icon.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [0, -35]
-        })
-      });
+  for (var i = 0; i < houseMarkers.length; i++) {
+    var marker = L.marker([houseMarkers[i].Latitude, houseMarkers[i].Longitude], {
+      icon: L.icon({
+        iconUrl: '/img/marker-icon.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [0, -35]
+      })
+    });
 
-      var popupContent = "";
-      for (var j = 0; j < houseMarkers.length; j++) {
-        if (houseMarkers[j].Latitude == houseMarkers[i].Latitude &&
-            houseMarkers[j].Longitude == houseMarkers[i].Longitude) {
-          popupContent += "<a href='" + houseMarkers[j].Url + "'>" + houseMarkers[j].Title + "</a><br>";
-        }
+    var popupContent = "";
+    for (var j = 0; j < houseMarkers.length; j++) {
+      if (houseMarkers[j].Latitude == houseMarkers[i].Latitude &&
+          houseMarkers[j].Longitude == houseMarkers[i].Longitude) {
+        popupContent += "<a href='" + houseMarkers[j].Url + "'>" + houseMarkers[j].Title + "</a><br>";
       }
-
-      marker.bindPopup(popupContent).addTo(mymap);
     }
 
-    var drawnItems = new L.FeatureGroup();
-    mymap.addLayer(drawnItems);
+    marker.bindPopup(popupContent).addTo(mymap);
+  }
 
-    var drawControl = new L.Control.Draw({
-      edit: {
-          featureGroup: drawnItems
-      },
-      draw: {
-          polyline: false,
-          polygon: true,
-          rectangle: true,
-          marker: false,
-          circlemarker: false,
-          circle: false
-      }
+  var drawnItems = new L.FeatureGroup();
+  mymap.addLayer(drawnItems);
+
+  var drawControl = new L.Control.Draw({
+    edit: {
+        featureGroup: drawnItems
+    },
+    draw: {
+        polyline: false,
+        polygon: true,
+        rectangle: true,
+        marker: false,
+        circlemarker: false,
+        circle: false
+    }
+  });
+
+
+  mymap.addControl(drawControl);
+
+  mymap.on(L.Draw.Event.CREATED, function(event) {
+    var layer = event.layer;
+    drawnItems.addLayer(layer);
+
+    var bounds = layer.getBounds();
+    var selectedMarkers = houseMarkers.filter(function(marker) {
+      var latlng = L.latLng(marker.Latitude, marker.Longitude);
+      return bounds.contains(latlng);
     });
 
+    var popupContent = "";
+    for (var i = 0; i < selectedMarkers.length; i++) {
+      popupContent += "<a href='" + selectedMarkers[i].Url + "'>" + selectedMarkers[i].Title + "</a><br>";
+    }
 
-    mymap.addControl(drawControl);
+    L.popup()
+      .setLatLng(bounds.getCenter())
+      .setContent(popupContent)
+      .openOn(mymap);
 
-    mymap.on(L.Draw.Event.CREATED, function(event) {
-      var layer = event.layer;
-      drawnItems.addLayer(layer);
-
-      var bounds = layer.getBounds();
-      var selectedMarkers = houseMarkers.filter(function(marker) {
-        var latlng = L.latLng(marker.Latitude, marker.Longitude);
-        return bounds.contains(latlng);
-      });
-
-      var popupContent = "";
-      for (var i = 0; i < selectedMarkers.length; i++) {
-        popupContent += "<a href='" + selectedMarkers[i].Url + "'>" + selectedMarkers[i].Title + "</a><br>";
-      }
-
-      L.popup()
-        .setLatLng(bounds.getCenter())
-        .setContent(popupContent)
-        .openOn(mymap);
-
-      mymap.on('draw:deleted', function () {
-        drawnItems.clearLayers();
-        document.getElementById("selected-markers-table").getElementsByTagName("tbody")[0].innerHTML = "";
-      });
-
-      populateSelectedMarkersTable(selectedMarkers);
+    mymap.on('draw:deleted', function () {
+      showGrid();
+      drawnItems.clearLayers();
+      document.getElementById("selected-markers-table").getElementsByTagName("tbody")[0].innerHTML = "";
     });
-  </script>
-  <!--/ footer Star /-->
-  <section class="section-footer">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-12 col-md-4">
-          <div class="widget-a">
-            <div class="w-header-a">
-              <h3 class="w-title-a text-brand">EstateAgency</h3>
-            </div>
-            <div class="w-body-a">
-              <p class="w-text-a color-text-a">
-                Enim minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip exea commodo consequat duis
-                sed aute irure.
-              </p>
-            </div>
-            <div class="w-footer-a">
-              <ul class="list-unstyled">
-                <li class="color-a">
-                  <span class="color-text-a">Phone .</span> contact@example.com</li>
-                <li class="color-a">
-                  <span class="color-text-a">Email .</span> +54 356 945234</li>
-              </ul>
-            </div>
+
+    populateSelectedMarkersTable(selectedMarkers, 3);
+    hideGrid();
+
+  });
+
+   function hideGrid() {
+    var gridContainer = document.getElementById("property-grid");
+    if (gridContainer) {
+      gridContainer.style.display = "none";
+    }
+  }
+
+  function showGrid() {
+    var gridContainer = document.getElementById("property-grid");
+    if (gridContainer) {
+      gridContainer.style.display = "block";
+    }
+  }
+</script>
+<!--/ footer Star /-->
+<section class="section-footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12 col-md-4">
+        <div class="widget-a">
+          <div class="w-header-a">
+            <h3 class="w-title-a text-brand">EstateAgency</h3>
+          </div>
+          <div class="w-body-a">
+            <p class="w-text-a color-text-a">
+              Enim minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip exea commodo consequat duis
+              sed aute irure.
+            </p>
+          </div>
+          <div class="w-footer-a">
+            <ul class="list-unstyled">
+              <li class="color-a">
+                <span class="color-text-a">Phone .</span> contact@example.com</li>
+              <li class="color-a">
+                <span class="color-text-a">Email .</span> +54 356 945234</li>
+            </ul>
           </div>
         </div>
-        <div class="col-sm-12 col-md-4 section-md-t3">
-          <div class="widget-a">
-            <div class="w-header-a">
-              <h3 class="w-title-a text-brand">The Company</h3>
-            </div>
-            <div class="w-body-a">
-              <div class="w-body-a">
-                <ul class="list-unstyled">
-                  <li class="item-list-a">
-                    <i class="fa fa-angle-right"></i> <a href="#">Site Map</a>
-                  </li>
-                  <li class="item-list-a">
-                    <i class="fa fa-angle-right"></i> <a href="#">Legal</a>
-                  </li>
-                  <li class="item-list-a">
-                    <i class="fa fa-angle-right"></i> <a href="#">Agent Admin</a>
-                  </li>
-                  <li class="item-list-a">
-                    <i class="fa fa-angle-right"></i> <a href="#">Careers</a>
-                  </li>
-                  <li class="item-list-a">
-                    <i class="fa fa-angle-right"></i> <a href="#">Affiliate</a>
-                  </li>
-                  <li class="item-list-a">
-                    <i class="fa fa-angle-right"></i> <a href="#">Privacy Policy</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+      </div>
+      <div class="col-sm-12 col-md-4 section-md-t3">
+        <div class="widget-a">
+          <div class="w-header-a">
+            <h3 class="w-title-a text-brand">The Company</h3>
           </div>
-        </div>
-        <div class="col-sm-12 col-md-4 section-md-t3">
-          <div class="widget-a">
-            <div class="w-header-a">
-              <h3 class="w-title-a text-brand">International sites</h3>
-            </div>
+          <div class="w-body-a">
             <div class="w-body-a">
               <ul class="list-unstyled">
                 <li class="item-list-a">
-                  <i class="fa fa-angle-right"></i> <a href="#">Venezuela</a>
+                  <i class="fa fa-angle-right"></i> <a href="#">Site Map</a>
                 </li>
                 <li class="item-list-a">
-                  <i class="fa fa-angle-right"></i> <a href="#">China</a>
+                  <i class="fa fa-angle-right"></i> <a href="#">Legal</a>
                 </li>
                 <li class="item-list-a">
-                  <i class="fa fa-angle-right"></i> <a href="#">Hong Kong</a>
+                  <i class="fa fa-angle-right"></i> <a href="#">Agent Admin</a>
                 </li>
                 <li class="item-list-a">
-                  <i class="fa fa-angle-right"></i> <a href="#">Argentina</a>
+                  <i class="fa fa-angle-right"></i> <a href="#">Careers</a>
                 </li>
                 <li class="item-list-a">
-                  <i class="fa fa-angle-right"></i> <a href="#">Singapore</a>
+                  <i class="fa fa-angle-right"></i> <a href="#">Affiliate</a>
                 </li>
                 <li class="item-list-a">
-                  <i class="fa fa-angle-right"></i> <a href="#">Philippines</a>
+                  <i class="fa fa-angle-right"></i> <a href="#">Privacy Policy</a>
                 </li>
               </ul>
             </div>
           </div>
         </div>
       </div>
+      <div class="col-sm-12 col-md-4 section-md-t3">
+        <div class="widget-a">
+          <div class="w-header-a">
+            <h3 class="w-title-a text-brand">International sites</h3>
+          </div>
+          <div class="w-body-a">
+            <ul class="list-unstyled">
+              <li class="item-list-a">
+                <i class="fa fa-angle-right"></i> <a href="#">Venezuela</a>
+              </li>
+              <li class="item-list-a">
+                <i class="fa fa-angle-right"></i> <a href="#">China</a>
+              </li>
+              <li class="item-list-a">
+                <i class="fa fa-angle-right"></i> <a href="#">Hong Kong</a>
+              </li>
+              <li class="item-list-a">
+                <i class="fa fa-angle-right"></i> <a href="#">Argentina</a>
+              </li>
+              <li class="item-list-a">
+                <i class="fa fa-angle-right"></i> <a href="#">Singapore</a>
+              </li>
+              <li class="item-list-a">
+                <i class="fa fa-angle-right"></i> <a href="#">Philippines</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
-  </section>
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <nav class="nav-footer">
-            <ul class="list-inline">
-              <li class="list-inline-item">
-                <a href="#">Home</a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">About</a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">Property</a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">Blog</a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">Contact</a>
-              </li>
-            </ul>
-          </nav>
-          <div class="socials-a">
-            <ul class="list-inline">
-              <li class="list-inline-item">
-                <a href="#">
-                  <i class="fa fa-facebook" aria-hidden="true"></i>
-                </a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">
-                  <i class="fa fa-twitter" aria-hidden="true"></i>
-                </a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">
-                  <i class="fa fa-instagram" aria-hidden="true"></i>
-                </a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">
-                  <i class="fa fa-pinterest-p" aria-hidden="true"></i>
-                </a>
-              </li>
-              <li class="list-inline-item">
-                <a href="#">
-                  <i class="fa fa-dribbble" aria-hidden="true"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div class="copyright-footer">
-            <p class="copyright color-text-a">
-              &copy; Copyright
-              <span class="color-a">EstateAgency</span> All Rights Reserved.
-            </p>
-          </div>
-          <div class="credits">
-            <!--
+  </div>
+</section>
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <nav class="nav-footer">
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <a href="#">Home</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">About</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">Property</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">Blog</a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">Contact</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="socials-a">
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fa fa-facebook" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fa fa-twitter" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fa fa-instagram" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fa fa-pinterest-p" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fa fa-dribbble" aria-hidden="true"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="copyright-footer">
+          <p class="copyright color-text-a">
+            &copy; Copyright
+            <span class="color-a">EstateAgency</span> All Rights Reserved.
+          </p>
+        </div>
+        <div class="credits">
+          <!--
               All the links in the footer should remain intact.
               You can delete the links only if you purchased the pro version.
               Licensing information: https://bootstrapmade.com/license/
               Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=EstateAgency
             -->
-            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-          </div>
+          Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
         </div>
       </div>
     </div>
-  </footer>
-  <!--/ Footer End /-->
-  <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
-  <div id="preloader"></div>
-  <!-- JavaScript Libraries -->
-  <script src="lib/jquery/jquery.min.js"></script>
-  <script src="lib/jquery/jquery-migrate.min.js"></script>
-  <script src="lib/popper/popper.min.js"></script>
-  <script src="lib/bootstrap/js/bootstrap.min.js"></script>
-  <script src="lib/easing/easing.min.js"></script>
-  <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-  <script src="lib/scrollreveal/scrollreveal.min.js"></script>
-  <!-- Contact Form JavaScript File -->
-  <script src="contactform/contactform.js"></script>
-  <!-- Template Main Javascript File -->
-  <script src="js/main.js"></script>
-  <script>
-    $('#advanced-options').hide();
-    // toggle advanced options
-    $('#adv-search-btn').click(function() {
-      $('#advanced-options').slideToggle("fast");
-    });
-    $('#adv-filter li').click(function() {
-      $('#adv-filter li.active').removeClass('active');
-      $(this).addClass('active');
-    });
-  </script>
+  </div>
+</footer>
+<!--/ Footer End /-->
+<a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+<div id="preloader"></div>
+<!-- JavaScript Libraries -->
+<script src="lib/jquery/jquery.min.js"></script>
+<script src="lib/jquery/jquery-migrate.min.js"></script>
+<script src="lib/popper/popper.min.js"></script>
+<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="lib/scrollreveal/scrollreveal.min.js"></script>
+<!-- Contact Form JavaScript File -->
+<script src="contactform/contactform.js"></script>
+<!-- Template Main Javascript File -->
+<script src="js/main.js"></script>
+<script>
+  $('#advanced-options').hide();
+  // toggle advanced options
+  $('#adv-search-btn').click(function() {
+    $('#advanced-options').slideToggle("fast");
+  });
+  $('#adv-filter li').click(function() {
+    $('#adv-filter li.active').removeClass('active');
+    $(this).addClass('active');
+  });
+</script>
 </body>
 </html>

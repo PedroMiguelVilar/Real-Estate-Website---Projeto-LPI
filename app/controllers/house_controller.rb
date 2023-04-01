@@ -152,30 +152,29 @@ class HouseController < ApplicationController
                        .order(sort_column + " " + sort_direction)
                        .paginate(page: params[:page], per_page: 9)
         @houses_map = House.where(query_params).where("Localizacao LIKE ?", "%#{params[:search]}%")
-                       .order(sort_column + " " + sort_direction)
       elsif query_params_1.present? # added check for presence of query parameters
         @houses = House.where(query_params)
                        .order(sort_column + " " + sort_direction)
                        .paginate(page: params[:page], per_page: 9)
         @houses_map = House.where(query_params)
-                       .order(sort_column + " " + sort_direction)
       else # handle case where no query parameters are present
         @houses = House.none.paginate(page: params[:page], per_page: 9)
         @houses_map = []
       end
 
       @image_urls = PagesController.new.scrape(@houses)
-
     end
     
     private
   
-    def sort_column
-      House.column_names.include?(params[:sort]) ? params[:sort] : "Id"
-    end
-    
-    def sort_direction
-      %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
-    end
+def sort_column
+  puts "params[:sort]: #{params[:sort_column]}"
+  House.column_names.include?(params[:sort_column]) ? params[:sort_column] : "Id"
+end
+
+def sort_direction
+  puts "params[:direction]: #{params[:sort_direction]}"
+  %w[asc desc].include?(params[:sort_direction]) ? params[:sort_direction] : "asc"
+end
 
 end
