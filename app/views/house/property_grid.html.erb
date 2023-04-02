@@ -317,6 +317,8 @@
         margin: 0 auto;
       }
     </style>
+    <br><br>
+  <section class="property-grid grid">
     <table id="selected-markers-table" class="center">
       <tbody>
       </tbody>
@@ -324,6 +326,7 @@
     <tbody>
     </tbody>
   </table>
+  </section>
 </section>
 <!--/ Property Grid End /-->
 <%= javascript_include_tag 'leaflet' %>
@@ -331,6 +334,14 @@
 <%= javascript_include_tag 'populate_selectedmarkers' %>
 <script>
   var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>', Id:  '<%= house.Id %>', Area_Util:  '<%= house.Area_Util %>', Total_quartos:  '<%= house.Total_quartos %>', Condicao:  '<%= house.Condicao %>', Situacao:  '<%= house.Situacao %>'},    <% end %>  ];
+  
+  var image_urls_map = <%= raw @image_urls_map.select(&:present?).to_json %>;
+
+  for(var i = 0; i < houseMarkers.length; i++){
+    if (image_urls_map.hasOwnProperty(i)) {
+      houseMarkers[i].ImageUrl = image_urls_map[i];
+    }
+  }
 
   var mymap = L.map('map').setView([38.736946, -9.142685], 6);
 
@@ -358,8 +369,8 @@
     }
 
     marker.bindPopup(popupContent).addTo(mymap);
-  }
 
+  }
   var drawnItems = new L.FeatureGroup();
   mymap.addLayer(drawnItems);
 

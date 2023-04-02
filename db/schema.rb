@@ -24,7 +24,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_04_010814) do
     t.string "Localizacao", limit: 131
     t.string "Latitude", limit: 18
     t.string "Longitude", limit: 19
-    t.string "Area_Util", limit: 7
+    t.decimal "Area_Util", limit: 7
     t.string "Area_Bruta", limit: 7
     t.decimal "Price_per_Area"
     t.integer "Ano_de_Construcao"

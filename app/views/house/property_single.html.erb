@@ -283,10 +283,28 @@
                         <span><%= @averages_single%> €</span>
                       </li>
                     <%end%>
-                    <% if @house.Price_per_Area.present? %>
+                    <% if @averages_comprar_distrito.present? %>
+                      <li class="d-flex justify-content-between">
+                        <strong>Preço Médio do Distrito:</strong>
+                        <span><%= @averages_comprar_distrito%> €</span>
+                      </li>
+                    <%end%>
+                    <% if @averages_comprar_concelho.present? %>
+                      <li class="d-flex justify-content-between">
+                        <strong>Preço Médio do Concelho:</strong>
+                        <span><%= @averages_comprar_concelho%> €</span>
+                      </li>
+                    <%end%>
+                    <% if @averages_comprar_freguesia.present? %>
+                      <li class="d-flex justify-content-between">
+                        <strong>Preço Médio da Freguesia:</strong>
+                        <span><%= @averages_comprar_freguesia%> €</span>
+                      </li>
+                    <%end%>
+                    <% if @price_per_Area.present? %>
                       <li class="d-flex justify-content-between">
                         <strong>Preço/Area:</strong>
-                        <span><%= @house.Price_per_Area%> €</span>
+                        <span><%= @price_per_Area%> €</span>
                       </li>
                     <%end%>
                     <% if @house.Ano_de_Construcao.present? %>
