@@ -235,7 +235,6 @@
           </div>
           <script>
             $(document).ready(function() {
-              console.log("sort function executing");
               $('#sort-by').on('change', function() {
                 var urlParams = new URLSearchParams(window.location.search);
                 var sortOption = $(this).val();
@@ -334,14 +333,7 @@
 <%= javascript_include_tag 'populate_selectedmarkers' %>
 <script>
   var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>', Id:  '<%= house.Id %>', Area_Util:  '<%= house.Area_Util %>', Total_quartos:  '<%= house.Total_quartos %>', Condicao:  '<%= house.Condicao %>', Situacao:  '<%= house.Situacao %>'},    <% end %>  ];
-  
-  var image_urls_map = <%= raw @image_urls_map.select(&:present?).to_json %>;
 
-  for(var i = 0; i < houseMarkers.length; i++){
-    if (image_urls_map.hasOwnProperty(i)) {
-      houseMarkers[i].ImageUrl = image_urls_map[i];
-    }
-  }
 
   var mymap = L.map('map').setView([38.736946, -9.142685], 6);
 
@@ -417,8 +409,37 @@
       document.getElementById("selected-markers-table").getElementsByTagName("tbody")[0].innerHTML = "";
     });
 
-    populateSelectedMarkersTable(selectedMarkers, 3);
-    hideGrid();
+    var urls = [];
+    for (var i = 0; i < selectedMarkers.length; i++) {
+        urls.push(selectedMarkers[i].Url);
+    }
+    
+    sendData({urls: urls});
+    
+    function sendData(data) {
+      $.ajax({
+        type: 'POST',
+        url: '/pages/test',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(response) {
+          console.log(response.message);
+          console.log(response.value);
+          var value = response.value;
+    
+          for(var i = 0; i < selectedMarkers.length; i++){
+              selectedMarkers[i].ImageUrl = value[i];
+          }
+
+          populateSelectedMarkersTable(selectedMarkers, 3);
+          hideGrid();
+          
+        }
+      });
+    }
+  
+
 
   });
 

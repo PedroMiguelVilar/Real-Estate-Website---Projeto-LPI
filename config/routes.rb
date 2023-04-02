@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   #get 'houses/search', to: 'house#search'
   get '/property-grid', to: 'house#property_grid', as: 'search_houses'
   get '/property_single', to: 'house#property_single'
-
+  post '/pages/test', to: 'pages#test'
 
   resources :houses do
     member do

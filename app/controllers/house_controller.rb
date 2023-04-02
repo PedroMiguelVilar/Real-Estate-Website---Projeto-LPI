@@ -203,7 +203,7 @@ class HouseController < ApplicationController
       end
 
       @image_urls = PagesController.new.scrape(@houses)
-      @image_urls_map = PagesController.new.scrape(@houses_map)
+      
     end
     
     private
