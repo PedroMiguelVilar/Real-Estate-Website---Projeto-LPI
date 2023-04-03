@@ -16,4 +16,6 @@
  *= require leaflet-search
  *= require leaflet.draw-src
  *= require leaflet.draw
+ *= require MarkerCluster.css
+ *= require MarkerCluster.Default.css
  */

@@ -316,15 +316,16 @@
         margin: 0 auto;
       }
     </style>
-    <br><br>
-  <section class="property-grid grid">
-    <table id="selected-markers-table" class="center">
+    <br>
+    <br>
+    <section class="property-grid grid">
+      <table id="selected-markers-table" class="center">
+        <tbody>
+        </tbody>
+      </table>
       <tbody>
       </tbody>
     </table>
-    <tbody>
-    </tbody>
-  </table>
   </section>
 </section>
 <!--/ Property Grid End /-->
@@ -334,7 +335,6 @@
 <script>
   var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>', Id:  '<%= house.Id %>', Area_Util:  '<%= house.Area_Util %>', Total_quartos:  '<%= house.Total_quartos %>', Condicao:  '<%= house.Condicao %>', Situacao:  '<%= house.Situacao %>'},    <% end %>  ];
 
-
   var mymap = L.map('map').setView([38.736946, -9.142685], 6);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -342,8 +342,23 @@
     maxZoom: 18
   }).addTo(mymap);
 
+  var uniqueLocations = [];
+
   for (var i = 0; i < houseMarkers.length; i++) {
-    var marker = L.marker([houseMarkers[i].Latitude, houseMarkers[i].Longitude], {
+    var location_1 = [houseMarkers[i].Latitude, houseMarkers[i].Longitude];
+
+    var locationExists = false;
+    for (var j = 0; j < uniqueLocations.length; j++) {
+      if (uniqueLocations[j][0] === location_1[0] && uniqueLocations[j][1] === location_1[1]) {
+        locationExists = true;
+        break;
+      }
+    }
+
+    if (!locationExists) {
+    uniqueLocations.push(location_1);
+
+    var marker = L.marker(location_1, {
       icon: L.icon({
         iconUrl: '/img/marker-icon.png',
         iconSize: [25, 41],
@@ -352,17 +367,20 @@
       })
     });
 
+
     var popupContent = "";
     for (var j = 0; j < houseMarkers.length; j++) {
-      if (houseMarkers[j].Latitude == houseMarkers[i].Latitude &&
-          houseMarkers[j].Longitude == houseMarkers[i].Longitude) {
+      if (houseMarkers[j].Latitude == location_1[0] &&
+          houseMarkers[j].Longitude == location_1[1]) {
         popupContent += "<a href='" + houseMarkers[j].Url + "'>" + houseMarkers[j].Title + "</a><br>";
       }
     }
 
     marker.bindPopup(popupContent).addTo(mymap);
 
+    }
   }
+
   var drawnItems = new L.FeatureGroup();
   mymap.addLayer(drawnItems);
 
@@ -413,9 +431,9 @@
     for (var i = 0; i < selectedMarkers.length; i++) {
         urls.push(selectedMarkers[i].Url);
     }
-    
+
     sendData({urls: urls});
-    
+
     function sendData(data) {
       $.ajax({
         type: 'POST',
@@ -427,18 +445,17 @@
           console.log(response.message);
           console.log(response.value);
           var value = response.value;
-    
+
           for(var i = 0; i < selectedMarkers.length; i++){
               selectedMarkers[i].ImageUrl = value[i];
           }
 
           populateSelectedMarkersTable(selectedMarkers, 3);
           hideGrid();
-          
         }
       });
     }
-  
+
 
 
   });
