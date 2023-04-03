@@ -19,5 +19,12 @@ Rails.application.routes.draw do
   end
   
   get '/scrape', to: 'pages#scrape'
-  
+
+  resources :users, only: [:new, :create]
+  get '/users/login', to: 'users#login', as: 'login'
+  post '/users/login', to: 'users#login'
+
+
+
+
 end

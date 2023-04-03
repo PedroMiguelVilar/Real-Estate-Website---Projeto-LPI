@@ -73,5 +73,7 @@ group :test do
 gem 'will_paginate', '~> 3.3.0'
 gem 'leaflet-rails'
 gem 'nokogiri'
+gem 'bcrypt', '~> 3.1.7'
+
 
 end

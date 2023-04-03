@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_04_010814) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_03_190727) do
   create_table "houses", primary_key: "Id", force: :cascade do |t|
     t.string "Url", limit: 196
     t.string "Id_link", limit: 36
@@ -24,7 +24,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_04_010814) do
     t.string "Localizacao", limit: 131
     t.string "Latitude", limit: 18
     t.string "Longitude", limit: 19
-    t.decimal "Area_Util", limit: 7
+    t.string "Area_Util", limit: 7
     t.string "Area_Bruta", limit: 7
     t.decimal "Price_per_Area"
     t.integer "Ano_de_Construcao"
@@ -80,6 +80,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_04_010814) do
   create_table "search_suggestions", force: :cascade do |t|
     t.string "term"
     t.integer "popularity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
