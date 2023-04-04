@@ -3,20 +3,20 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
-  # root "articles#index"
+  root "house#index"
   get '/index', to: 'house#index'
   get '/contact', to: 'house#contact'
   get '/about', to: 'house#about'
-  #get 'houses/search', to: 'house#search'
   get '/property-grid', to: 'house#property_grid', as: 'search_houses'
   get '/property_single', to: 'house#property_single'
   post '/pages/test', to: 'pages#test'
 
-  resources :houses do
+  resources :houses, controller: 'house' do
     member do
       get 'property_single/:id', to: 'house#property_single', as: 'property_single'
     end
   end
+
   
   get '/scrape', to: 'pages#scrape'
 
@@ -25,6 +25,10 @@ Rails.application.routes.draw do
   post '/users/login', to: 'users#login'
   delete '/logout', to: 'users#logout', as: 'logout'
 
+  post '/property_single/:id/favorite', to: 'house#favorite', as: 'favorite_house'
+  delete '/property_single/:id/unfavorite', to: 'house#unfavorite', as: 'unfavorite_house'
+  
+  get '/users/:id/favourites', to: 'users#favorites', as: 'user_favourites'
 
 
 

@@ -158,29 +158,29 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="about.html">About</a>
-          </li>        
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="contact.html">Contact</a>
           </li>
           <li class="nav-item">
-              <% if session[:user_id] %>
-                <a class="nav-link" href="#">Hi <%= User.find(session[:user_id]).name %>!</a>
+            <% if session[:user_id] %>
+              <a class="nav-link" href="#">Hi <%= User.find(session[:user_id]).name %>!</a>
+            <% end %>
+          </li>
+          <% if session[:user_id] %>
+            <li class="nav-item">
+              <%= form_tag logout_path, method: :delete do %>
+                <%= submit_tag "Logout", class: "btn btn-link nav-link" %>
               <% end %>
             </li>
-            <% if session[:user_id] %>
-              <li class="nav-item">
-                <%= form_tag logout_path, method: :delete do %>
-                  <%= submit_tag "Logout", class: "btn btn-link nav-link" %>
-                <% end %>
-              </li>
-            <% else %>
-              <li class="nav-item">
-                <%= link_to "Login", login_path, class: "nav-link" %>
-              </li>
-              <li class="nav-item">
-                <%= link_to "Register", new_user_path, class: "nav-link" %>
-              </li>
-            <% end %>
+          <% else %>
+            <li class="nav-item">
+              <%= link_to "Login", login_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Register", new_user_path, class: "nav-link" %>
+            </li>
+          <% end %>
         </ul>
       </div>
       <button type="button" class="btn btn-b-n navbar-toggle-box-collapse d-none d-md-block" data-toggle="collapse"
@@ -220,7 +220,6 @@
   </section>
   <!--/ Intro Single End /-->
   <!--/ Property Single Star /-->
-
   <section class="property-single nav-arrow-b">
     <div class="container">
       <div class="row">
@@ -228,9 +227,9 @@
           <div id="property-single-carousel" class="owl-carousel owl-arrow gallery-property">
             <% @image_urls.each do |image| %>
               <% if image.present?%>
-              <div class="carousel-item-b">
-                <img src="<%= image %>" alt="" style="width: 1440px !important; height: 1080px !important;">
-              </div>
+                <div class="carousel-item-b">
+                  <img src="<%= image %>" alt="" style="width: 1440px !important; height: 1080px !important;">
+                </div>
               <%end%>
             <%end%>
           </div>
@@ -613,6 +612,26 @@
                   <% end %>
                 </ul>
               </div>
+              <link rel="stylesheet" href="/css/heart.css">
+              <% if !current_user.favorite_houses.include?(@house) %>
+                <%= form_tag favorite_house_path(@house), method: :post, id: "favorite-form-#{@house.id}" do %>
+                  <div class="click" id="click-<%= @house.id %>">
+                    <span class="fa fa-heart-o" id="heart-<%= @house.id %>" onclick="document.getElementById('favorite-form-<%= @house.id %>').submit();"></span>
+                    <div class="ring" id="ring-<%= @house.id %>"></div>
+                    <div class="ring2" id="ring2-<%= @house.id %>"></div>
+                    <p class="info" id="info-<%= @house.id %>">Added to favorites!</p>
+                  </div>
+                <% end %>
+              <% else %>
+                <%= form_tag unfavorite_house_path(@house), method: :delete, id: "unfavorite-form-#{@house.id}" do %>
+                  <div class="click click active active-2 active-3" id="click-<%= @house.id %>" onclick="document.getElementById('unfavorite-form-<%= @house.id %>').submit();">
+                    <span class="fa fa-heart" id="heart-<%= @house.id %>"></span>
+                    <div class="ring" id="ring-<%= @house.id %>"></div>
+                    <div class="ring2" id="ring2-<%= @house.id %>"></div>
+                    <p class="info" id="info-<%= @house.id %>">Removed from favorites!</p>
+                  </div>
+                <% end %>
+              <% end %>
             </div>
           </div>
         </div>
@@ -949,6 +968,41 @@
     $('#adv-filter li').click(function() {
       $('#adv-filter li.active').removeClass('active');
       $(this).addClass('active');
+    });
+
+
+    var heart = document.getElementById('heart-<%= @house.id %>');
+    var click = document.getElementById('click-<%= @house.id %>');
+    var ring = document.getElementById('ring-<%= @house.id %>');
+    var ring2 = document.getElementById('ring2-<%= @house.id %>');
+    var info = document.getElementById('info-<%= @house.id %>');
+
+    click.addEventListener('click', function() {
+      if (heart.classList.contains("fa-heart")) {
+    click.classList.remove('active');
+    setTimeout(function() {
+      click.classList.remove('active-2');
+    }, 30);
+    click.classList.remove('active-3');
+    setTimeout(function() {
+      heart.classList.remove('fa-heart');
+      heart.classList.add('fa-heart-o');
+    }, 15);
+      } else {
+    click.classList.add('active');
+    click.classList.add('active-2');
+    setTimeout(function() {
+      heart.classList.add('fa-heart');
+      heart.classList.remove('fa-heart-o');
+    }, 150);
+    setTimeout(function() {
+      click.classList.add('active-3');
+    }, 150);
+    info.classList.add('info-tog');
+    setTimeout(function(){
+      info.classList.remove('info-tog');
+    },1000);
+      }
     });
   </script>
 </body>

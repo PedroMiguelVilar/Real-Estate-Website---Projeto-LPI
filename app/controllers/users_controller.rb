@@ -1,5 +1,15 @@
 class UsersController < ApplicationController
 
+  def favorites
+    if current_user && current_user.id == params[:id].to_i
+      @favorites = current_user.favorite_houses
+      render "favourites"
+    else
+      redirect_to root_path, alert: "You are not authorized to view this page"
+    end
+  end
+    
+
     def new
         @user = User.new
     end

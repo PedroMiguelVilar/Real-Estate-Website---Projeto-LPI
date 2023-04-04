@@ -1,0 +1,11 @@
+<% if @favorites.any? %>
+  <h2>Favorites:</h2>
+
+  <ul>
+    <% @favorites.each do |favorite| %>
+      <li>
+        <%= favorite.Title %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

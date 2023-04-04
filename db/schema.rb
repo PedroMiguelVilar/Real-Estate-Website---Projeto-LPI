@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_03_190727) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_04_120949) do
+  create_table "favorites", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "house_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["house_id"], name: "index_favorites_on_house_id"
+    t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
   create_table "houses", primary_key: "Id", force: :cascade do |t|
     t.string "Url", limit: 196
     t.string "Id_link", limit: 36
@@ -92,4 +101,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_03_190727) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "favorites", "houses"
+  add_foreign_key "favorites", "users"
 end
