@@ -158,28 +158,29 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="about.html">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="property-grid.html">Property</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="blog-grid.html">Blog</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false">
-              Pages
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item active" href="property-single.html">Property Single</a>
-              <a class="dropdown-item" href="blog-single.html">Blog Single</a>
-              <a class="dropdown-item" href="agents-grid.html">Agents Grid</a>
-              <a class="dropdown-item" href="agent-single.html">Agent Single</a>
-            </div>
-          </li>
+          </li>        
           <li class="nav-item">
             <a class="nav-link" href="contact.html">Contact</a>
           </li>
+          <li class="nav-item">
+              <% if session[:user_id] %>
+                <a class="nav-link" href="#">Hi <%= User.find(session[:user_id]).name %>!</a>
+              <% end %>
+            </li>
+            <% if session[:user_id] %>
+              <li class="nav-item">
+                <%= form_tag logout_path, method: :delete do %>
+                  <%= submit_tag "Logout", class: "btn btn-link nav-link" %>
+                <% end %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= link_to "Login", login_path, class: "nav-link" %>
+              </li>
+              <li class="nav-item">
+                <%= link_to "Register", new_user_path, class: "nav-link" %>
+              </li>
+            <% end %>
         </ul>
       </div>
       <button type="button" class="btn btn-b-n navbar-toggle-box-collapse d-none d-md-block" data-toggle="collapse"

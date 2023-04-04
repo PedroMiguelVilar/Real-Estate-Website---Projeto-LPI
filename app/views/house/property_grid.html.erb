@@ -159,6 +159,25 @@
           <li class="nav-item">
             <a class="nav-link" href="contact.html">Contact</a>
           </li>
+          <li class="nav-item">
+            <% if session[:user_id] %>
+              <a class="nav-link" href="#">Hi <%= User.find(session[:user_id]).name %>!</a>
+            <% end %>
+          </li>
+          <% if session[:user_id] %>
+            <li class="nav-item">
+              <%= form_tag logout_path, method: :delete do %>
+                <%= submit_tag "Logout", class: "btn btn-link nav-link" %>
+              <% end %>
+            </li>
+          <% else %>
+            <li class="nav-item">
+              <%= link_to "Login", login_path, class: "nav-link" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Register", new_user_path, class: "nav-link" %>
+            </li>
+          <% end %>
         </ul>
       </div>
       <button type="button" class="btn btn-b-n navbar-toggle-box-collapse d-none d-md-block" data-toggle="collapse"
@@ -214,7 +233,7 @@
                 <option value="Price <%= params[:sort_direction] = "desc"%>">Price ↓</option>
                 <option value="Ano_de_Construcao <%= params[:sort_direction] = "desc"%>">Newest</option>
                 <option value="Ano_de_Construcao <%= params[:sort_direction] = "asc"%>">Oldest</option>
-                </select>
+              </select>
             </form>
           </div>
           <script>
@@ -231,7 +250,6 @@
         </div>
         <% if @houses.any? %>
           <% @houses.each_with_index do |house, i| %>
-            
             <div class="col-md-4">
               <div class="card-box-a card-shadow">
                 <div class="img-box-a">
@@ -245,7 +263,7 @@
                   <div class="card-overlay-a-content">
                     <div class="card-header-a">
                       <h2 class="card-title-a">
-                       <a href="/property_single.<%= house.Id %>"><%= house.Localizacao %></a>
+                        <a href="/property_single.<%= house.Id %>"><%= house.Localizacao %></a>
                       </h2>
                     </div>
                     <div class="card-body-a">
@@ -305,15 +323,15 @@
     <br>
     <section class="property-grid grid">
       <div class="container">
-      <div class="row">
-      <table id="selected-markers-table" class="center">
-        <tbody>
-        </tbody>
-      </table>
-      <tbody>
-      </tbody>
-    </table>
-    </div>
+        <div class="row">
+          <table id="selected-markers-table" class="center">
+            <tbody>
+            </tbody>
+          </table>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 </section>

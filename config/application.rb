@@ -20,5 +20,7 @@ module PlataformaWeb
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    config.middleware.use ActionDispatch::Flash
+
   end
 end

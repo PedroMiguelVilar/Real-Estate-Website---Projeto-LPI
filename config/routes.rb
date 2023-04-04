@@ -23,6 +23,8 @@ Rails.application.routes.draw do
   resources :users, only: [:new, :create]
   get '/users/login', to: 'users#login', as: 'login'
   post '/users/login', to: 'users#login'
+  delete '/logout', to: 'users#logout', as: 'logout'
+
 
 
 

@@ -18,9 +18,10 @@ class UsersController < ApplicationController
 
 
     def logout
-        session[:user_id] = nil
-        redirect_to root_url, notice: "Logged out!"
-      end
+      session[:user_id] = nil
+      redirect_to index_url, notice: "Logged out!"
+    end
+    
 
 
     def require_login

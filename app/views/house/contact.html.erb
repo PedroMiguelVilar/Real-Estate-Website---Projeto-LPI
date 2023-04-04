@@ -37,96 +37,101 @@
 <body>
 
   <div class="click-closed"></div>
-  <!--/ Form Search Star /-->
-  <div class="box-collapse">
-    <div class="title-box-d">
-      <h3 class="title-d">Search Property</h3>
-    </div>
-    <span class="close-box-collapse right-boxed ion-ios-close"></span>
-    <div class="box-collapse-wrap form">
-      <form class="form-a">
-        <div class="row">
-          <div class="col-md-12 mb-2">
-            <div class="form-group">
-              <label for="Type">Keyword</label>
-              <input type="text" class="form-control form-control-lg form-control-a" placeholder="Keyword">
+     <!--/ Form Search Star /-->
+    <div class="box-collapse">
+      <div class="title-box-d">
+        <h3 class="title-d">Procurar</h3>
+      </div>
+      <span class="close-box-collapse right-boxed ion-ios-close"></span>
+      <div class="box-collapse-wrap form"><%= form_tag search_houses_path, method: :get, autocomplete: "off", class:"form-a" do %>
+          <div class="row">
+            <div class="col-md-12 mb-2">
+              <div class="form-group">
+                <label for="search">Procurar</label><%= text_field_tag :search, params[:search], id: "search", class:"form-control form-control-lg form-control-a", spellcheck: false, placeholder: "Procurar Propriedade", data: { source: search_suggestions_path } %>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6 mb-2">
-            <div class="form-group">
-              <label for="Type">Type</label>
-              <select class="form-control form-control-lg form-control-a" id="Type">
-                <option>All Type</option>
-                <option>For Rent</option>
-                <option>For Sale</option>
-                <option>Open House</option>
-              </select>
+            <div class="col-md-6 mb-2">
+              <div class="form-group">
+                <label for="situacao">Situacao</label><%= select_tag :situacao, options_for_select([['Alugar', 'alugar'], ['Comprar', 'comprar']], params[:situacao]), class:"form-control form-control-lg form-control-a", include_blank: false %>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6 mb-2">
-            <div class="form-group">
-              <label for="city">City</label>
-              <select class="form-control form-control-lg form-control-a" id="city">
-                <option>All City</option>
-                <option>Alabama</option>
-                <option>Arizona</option>
-                <option>California</option>
-                <option>Colorado</option>
-              </select>
+            <div class="col-md-6 mb-2">
+              <div class="form-group">
+                <label for="type">Tipo</label><%= select_tag :type, options_for_select([['Moradia', 'moradias'], ['Apartamento', 'apartamentos']], params[:type]), class:"form-control form-control-lg form-control-a",include_blank: false %>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6 mb-2">
-            <div class="form-group">
-              <label for="bedrooms">Bedrooms</label>
-              <select class="form-control form-control-lg form-control-a" id="bedrooms">
-                <option>Any</option>
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-              </select>
+            <div class="col-md-6 mb-2">
+              <div class="form-group">
+                <label>Condicao</label>
+                <br>
+                <label><%= check_box_tag 'Condicao[]', 'Novo', params[:Condicao]&.include?('Novo') %> Novo </label>
+                <br>
+                <label><%= check_box_tag 'Condicao[]', 'Usado', params[:Condicao]&.include?('Usado') %> Usado </label>
+                <br>
+                <label><%= check_box_tag 'Condicao[]', 'Recuperado', params[:Condicao]&.include?('Recuperado') %> Recuperado </label>
+                <br>
+                <label><%= check_box_tag 'Condicao[]', 'Por recuperar', params[:Condicao]&.include?('Por recuperar') %> Por recuperar </label>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6 mb-2">
-            <div class="form-group">
-              <label for="garages">Garages</label>
-              <select class="form-control form-control-lg form-control-a" id="garages">
-                <option>Any</option>
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-                <option>04</option>
-              </select>
+            <div class="col-md-6 mb-2">
+              <div class="form-group">
+                <label for="Total_quartos">Número de Quartos</label>
+                <br>
+                <label><%= check_box_tag 'Total_quartos[]', '0', params[:Total_quartos]&.include?('0') %> T0 </label>
+                <label><%= check_box_tag 'Total_quartos[]', '1', params[:Total_quartos]&.include?('1') %> T1 </label>
+                <br>
+                <label><%= check_box_tag 'Total_quartos[]', '2', params[:Total_quartos]&.include?('2') %> T2 </label>
+                <label><%= check_box_tag 'Total_quartos[]', '3', params[:Total_quartos]&.include?('3') %> T3 </label>
+                <br>
+                <label><%= check_box_tag 'Total_quartos[]', '4', params[:Total_quartos]&.include?('4') %> T4 </label>
+                <label><%= check_box_tag 'Total_quartos[]', '5', params[:Total_quartos]&.include?('5') %> T5 </label>
+                <br>
+                <label><%= check_box_tag 'Total_quartos[]', '6', params[:Total_quartos]&.include?('6') %> T6 </label>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6 mb-2">
-            <div class="form-group">
-              <label for="bathrooms">Bathrooms</label>
-              <select class="form-control form-control-lg form-control-a" id="bathrooms">
-                <option>Any</option>
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-              </select>
+            <div class="col-md-6 mb-2">
+              <div class="form-group">
+                <label for="Price">Preço Min.</label><%= text_field_tag :min_price, params[:min_price], class: 'form-control form-control-lg form-control-a',placeholder: "Preço Min."%>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6 mb-2">
-            <div class="form-group">
-              <label for="price">Min Price</label>
-              <select class="form-control form-control-lg form-control-a" id="price">
-                <option>Unlimite</option>
-                <option>$50,000</option>
-                <option>$100,000</option>
-                <option>$150,000</option>
-                <option>$200,000</option>
-              </select>
+            <div class="col-md-6 mb-2">
+              <div class="form-group">
+                <label for="Price">Preço Max.</label><%= text_field_tag :max_price, params[:max_price], class: 'form-control form-control-lg form-control-a',placeholder: "Preço Max."%>
+              </div>
             </div>
+            <a href="#" id="adv-search-btn" class="col-md-12">Advanced Options </i>
+          </a>
+          <div id="advanced-options">
+            <ul id="adv-filter">
+              <div class="form-group">
+                <label for="year">Ano Min.</label><%= text_field_tag :min_year, params[:min_year], class: 'form-control form-control-lg form-control-a',placeholder: "Ano Minimo"%>
+              </div>
+              <div class="form-group">
+                <label for="year">Ano Max.</label><%= text_field_tag :max_year, params[:max_year], class: 'form-control form-control-lg form-control-a',placeholder: "Ano Maximo"%>
+              </div>
+              <div class="form-group">
+                <label for="Acesso_Mobilidade_Reduzida">Acesso Mobilidade Reduzida &nbsp</label><%= select_tag :Acesso_Mobilidade_Reduzida, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Acesso_Mobilidade_Reduzida]), include_blank: true %> <br>
+                <label for="Arrecadação">Arrecadação &nbsp</label><%= select_tag :Arrecadação, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Arrecadação]), include_blank: true %> <br>
+                <label for="Elevador">Elevador &nbsp</label><%= select_tag :Elevador, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Elevador]), include_blank: true %> <br>
+                <label for="Garagem">Garagem &nbsp</label><%= select_tag :Garagem, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Garagem]), include_blank: true %> <br>
+                <label for="Estacionamento">Estacionamento &nbsp</label><%= select_tag :Estacionamento, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Estacionamento]), include_blank: true %> <br>
+                <label for="Jardim">Jardim &nbsp</label><%= select_tag :Jardim, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Jardim]), include_blank: true %> <br>
+                <label for="Lareira">Lareira &nbsp</label><%= select_tag :Lareira, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Lareira]), include_blank: true %> <br>
+                <label for="Recuperador_de_calor">Recuperador de calor &nbsp</label><%= select_tag :Recuperador_de_calor, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Recuperador_de_calor]), include_blank: true %> <br>
+                <label for="Vidros_duplos">Vidros Duplos &nbsp</label><%= select_tag :Vidros_duplos, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Vidros_duplos]), include_blank: true %> <br>
+                <label for="Varanda">Varanda &nbsp</label><%= select_tag :Varanda, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Varanda]), include_blank: true %> <br>
+                <label for="Terraço">Terraço &nbsp</label><%= select_tag :Terraço, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Terraço]), include_blank: true %> <br>
+                <label for="Suite">Suite &nbsp</label><%= select_tag :Suite, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Suite]), include_blank: true %> <br>
+                <label for="Segurança">Segurança &nbsp</label><%= select_tag :Segurança, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Segurança]), include_blank: true %> <br>
+                <label for="Piscina">Piscina &nbsp</label><%= select_tag :Piscina, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Piscina]), include_blank: true %> <br>
+                <label for="Painéis_Solares">Painéis Solares &nbsp</label><%= select_tag :Painéis_Solares, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Painéis_Solares]), include_blank: true %> <br>
+                <label for="Logradouro">Logradouro &nbsp</label><%= select_tag :Logradouro, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Logradouro]), include_blank: true %>
+              </div>
+            </ul>
           </div>
-          <div class="col-md-12">
-            <button type="submit" class="btn btn-b">Search Property</button>
-          </div>
+          <div class="col-md-12"><%= submit_tag "Procurar Propriedade" , class:"btn btn-b"%> <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script><%= javascript_include_tag 'search' %> </div>
         </div>
-      </form>
-    </div>
+      <% end %> </div>
   </div>
   <!--/ Form Search End /-->
 
@@ -155,6 +160,25 @@
           <li class="nav-item">
             <a class="nav-link" href="contact.html">Contact</a>
           </li>
+          <li class="nav-item">
+              <% if session[:user_id] %>
+                <a class="nav-link" href="#">Hi <%= User.find(session[:user_id]).name %>!</a>
+              <% end %>
+            </li>
+            <% if session[:user_id] %>
+              <li class="nav-item">
+                <%= form_tag logout_path, method: :delete do %>
+                  <%= submit_tag "Logout", class: "btn btn-link nav-link" %>
+                <% end %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= link_to "Login", login_path, class: "nav-link" %>
+              </li>
+              <li class="nav-item">
+                <%= link_to "Register", new_user_path, class: "nav-link" %>
+              </li>
+            <% end %>
         </ul>
       </div>
       <button type="button" class="btn btn-b-n navbar-toggle-box-collapse d-none d-md-block" data-toggle="collapse"
@@ -501,6 +525,16 @@
 
   <!-- Template Main Javascript File -->
   <script src="js/main.js"></script>
-
+<script>
+  $('#advanced-options').hide();
+  // toggle advanced options
+  $('#adv-search-btn').click(function() {
+    $('#advanced-options').slideToggle("fast");
+  });
+  $('#adv-filter li').click(function() {
+    $('#adv-filter li.active').removeClass('active');
+    $(this).addClass('active');
+  });
+</script>
 </body>
 </html>
