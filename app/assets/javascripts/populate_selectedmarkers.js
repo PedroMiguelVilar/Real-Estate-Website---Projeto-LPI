@@ -1,5 +1,36 @@
-function populateSelectedMarkersTable(selectedMarkers, numColumns) {
+function populateSelectedMarkersTable(selectedHouses, numColumns, sortOrder) {
+
+  if (sortOrder) {
+    switch (sortOrder) {
+      case "price-low-to-high":
+        selectedHouses.sort(function(a, b) {
+          console.log(a.Price - b.Price)
+          return a.Price - b.Price;
+        });
+        break;
+      case "price-high-to-low":
+        selectedHouses.sort(function(a, b) {
+          return b.Price - a.Price;
+        });
+        break;
+      case "area-small-to-large":
+        selectedHouses.sort(function(a, b) {
+          return a.Ano_de_Construcao - b.Ano_de_Construcao;
+        });
+        break;
+      case "area-large-to-small":
+        selectedHouses.sort(function(a, b) {
+          return b.Ano_de_Construcao - a.Ano_de_Construcao;
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
+
   var tableBody = document.getElementById("selected-markers-table").getElementsByTagName("tbody")[0];
+  tableBody.innerHTML = ''; // Clear the table body
   var template = `
     <div>
       <div class="card-box-a card-shadow">
@@ -37,25 +68,25 @@ function populateSelectedMarkersTable(selectedMarkers, numColumns) {
               </ul>
             </div>
           </div>
-        </div>
+        </div>  
       </div>
     </div>
   `;
   var row, cell, html, houseIndex;
-  for (var i = 0; i < selectedMarkers.length; i++) {
+  for (var i = 0; i < selectedHouses.length; i++) {
     houseIndex = i % numColumns;
     if (houseIndex == 0) {
       row = tableBody.insertRow();
     }
     cell = row.insertCell(houseIndex);
-    html = template.replace('{{imageUrl}}', selectedMarkers[i].ImageUrl || 'img/house-default.jpg')
-                      .replace('{{location}}', selectedMarkers[i].Localizacao)
-                      .replace('{{status}}', selectedMarkers[i].Situacao)
-                      .replace('{{price}}', selectedMarkers[i].Price|| '')
-                      .replace('{{id}}', selectedMarkers[i].Id)
-                      .replace('{{area}}', selectedMarkers[i].Area_Util || '')
-                      .replace('{{bedrooms}}', selectedMarkers[i].Total_quartos || '')
-                      .replace('{{condition}}', selectedMarkers[i].Condicao || '');
+    html = template.replace('{{imageUrl}}', selectedHouses[i].ImageUrl || 'img/house-default.jpg')
+                      .replace('{{location}}', selectedHouses[i].Localizacao)
+                      .replace('{{status}}', selectedHouses[i].Situacao)
+                      .replace('{{price}}', selectedHouses[i].Price|| '')
+                      .replace('{{id}}', selectedHouses[i].Id)
+                      .replace('{{area}}', selectedHouses[i].Area_Util || '')
+                      .replace('{{bedrooms}}', selectedHouses[i].Total_quartos || '')
+                      .replace('{{condition}}', selectedHouses[i].Condicao || '');
     cell.innerHTML = html;
   }
-}
+  }

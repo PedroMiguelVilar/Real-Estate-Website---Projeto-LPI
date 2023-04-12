@@ -162,11 +162,17 @@
           <li class="nav-item">
             <a class="nav-link" href="contact.html">Contact</a>
           </li>
-          <li class="nav-item">
-            <% if session[:user_id] %>
-              <a class="nav-link" href="#">Hi <%= User.find(session[:user_id]).name %>!</a>
-            <% end %>
-          </li>
+          <li class="nav-item dropdown">
+              <li class="nav-item">
+                <% if session[:user_id] %>
+                  <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">Hi <%= User.find(session[:user_id]).name %>!</a>
+                <% end %>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/users/<%= session[:user_id] %>/favourites">Favorites</a>
+                </div>
+              </li>
+            </li>
           <% if session[:user_id] %>
             <li class="nav-item">
               <%= form_tag logout_path, method: :delete do %>
@@ -612,6 +618,7 @@
                   <% end %>
                 </ul>
               </div>
+            <% if current_user %>
               <link rel="stylesheet" href="/css/heart.css">
               <% if !current_user.favorite_houses.include?(@house) %>
                 <%= form_tag favorite_house_path(@house), method: :post, id: "favorite-form-#{@house.id}" do %>
@@ -633,6 +640,7 @@
                 <% end %>
               <% end %>
             </div>
+            <% end %>
           </div>
         </div>
         <% if @house.Latitude.present? && @house.Longitude.present? && %>

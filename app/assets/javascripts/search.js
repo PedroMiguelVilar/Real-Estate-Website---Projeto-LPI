@@ -12,7 +12,6 @@ $(function() {
         return false;
       }
       $(event.target).val(ui.item.value);
-      $("#search-form").submit();
     }
   });
 });
