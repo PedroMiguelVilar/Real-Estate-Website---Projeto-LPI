@@ -332,14 +332,26 @@
       <div class="col-sm-12">
         <div class="grid-option">
           <div class="container">
-            <div>
-              <select class = "custom-select" id="sort-menu">
-                <option selected disabled hidden>Sort by</option>
-                <option value="price-low-to-high">Price ↑</option>
-                <option value="price-high-to-low">Price ↓</option>
-                <option value="area-small-to-large">Newest</option>
-                <option value="area-large-to-small">Oldest</option>
-              </select>
+            <div id="submit-menu">
+              <div>
+                <select class = "custom-select" id="sort-menu">
+                  <option selected disabled hidden>Sort by</option>
+                  <option value="price-low-to-high">Price ↑</option>
+                  <option value="price-high-to-low">Price ↓</option>
+                  <option value="area-small-to-large">Newest</option>
+                  <option value="area-large-to-small">Oldest</option>
+                </select>
+              </div>
+              <label for="min-price">Minimum Price:</label>
+              <input type="number" id="min-price" name="min-price" placeholder= "Min. Price" >
+              <br>
+              <label for="max-price">Maximum Price:</label>
+              <input type="number" id="max-price" name="max-price" placeholder= "Max. Price">
+              <br>
+              <label for="show-null-prices">
+                <input type="checkbox" id="show-null-prices" name="show-null-prices" value="false">
+                Show houses with no price
+              </label>
             </div>
             <table id="selected-markers-table" class="center">
               <tbody>
@@ -359,6 +371,7 @@
 <%= javascript_include_tag 'populate_selectedmarkers' %>
 <script>
   var houseMarkers = [<% @houses_map.select{ |house| house.Latitude.present? && house.Longitude.present? }.each do |house| %>      { Latitude: <%= house.Latitude %>, Longitude: <%= house.Longitude %>, Title: '<%= house.Title %>', Url:  '<%= house.Url %>', Price:  '<%= house.Price %>', Localizacao:  '<%= house.Localizacao %>', Id:  '<%= house.Id %>', Area_Util:  '<%= house.Area_Util %>', Total_quartos:  '<%= house.Total_quartos %>', Condicao:  '<%= house.Condicao %>',Ano_de_Construcao:  '<%= house.Ano_de_Construcao %>', Situacao:  '<%= house.Situacao %>'},    <% end %>  ];
+
 
   var mymap = L.map('map').setView([38.736946, -9.142685], 6);
 
@@ -454,6 +467,7 @@
       showGrid();
       drawnItems.clearLayers();
       document.getElementById("selected-markers-table").getElementsByTagName("tbody")[0].innerHTML = "";
+      selectedHouses = [];
     });
 
     var urls = [];
@@ -479,14 +493,8 @@
               selectedMarkers[i].ImageUrl = value[i];
           }
 
-          populateSelectedMarkersTable(selectedHouses, 3);
-            var sortMenu = document.getElementById("sort-menu");
-
-          sortMenu.addEventListener("change", function() {
-            var sortOrder = sortMenu.value;
-            populateSelectedMarkersTable(selectedHouses, 3, sortOrder);
-          });
-
+          populateSelectedMarkersTable(selectedHouses, 3, null, 0, 9999999, false);
+          
           hideGrid();
         }
       });
@@ -494,6 +502,22 @@
 
   });
 
+  // Add event listener to the select element
+  document.getElementById("submit-menu").addEventListener("change", function() {
+
+    // Get the selected sort option
+    var sortOrder = document.getElementById("sort-menu").value;
+
+    // Get the minimum price and maximum price values from your other inputs
+    var minPrice = parseInt(document.getElementById("min-price").value) || 0;
+    var maxPrice = parseInt(document.getElementById("max-price").value) || 999999999;
+
+    // Get the checkbox value
+    var showNullPrices = document.getElementById("show-null-prices").checked;
+
+    // Call the function to populate the table with the selected data
+    populateSelectedMarkersTable(selectedHouses, 3, sortOrder, minPrice, maxPrice, showNullPrices);
+  });
    var gridContainer = document.getElementById("property-grid_2");
    if (gridContainer) {
      gridContainer.style.display = "none";
@@ -520,7 +544,6 @@
       gridContainer.style.display = "none";
     }
   }
-
 </script>
 <!--/ footer Star /-->
 <section class="section-footer">
