@@ -15,8 +15,6 @@ if ((minPrice !== null && maxPrice !== null) || showNullPrices) {
   });
 }
 
-  
-
   if (sortOrder) {
     switch (sortOrder) {
       case "price-low-to-high":

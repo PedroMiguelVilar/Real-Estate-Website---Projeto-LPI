@@ -30,7 +30,6 @@ Rails.application.routes.draw do
   
   get '/users/:id/favourites', to: 'users#favorites', as: 'user_favourites'
 
-
-
+  get '/map_districts', to: 'house#map_districts'
 
 end
