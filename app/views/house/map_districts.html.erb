@@ -182,7 +182,7 @@
          var averagePrice_c = null;
          // Loop through the results from the controller to find the average price for the current freguesia
          for (var i = 0; i < myResults.length; i++) {
-           if (myResults[i].freguesia && myResults[i].freguesia.toUpperCase() === freguesia.toUpperCase()) { // Compare freguesia names in uppercase
+           if (myResults[i].freguesia && myResults[i].freguesia.replace(/\s+/g, '').toUpperCase() === freguesia.toUpperCase()) { // Compare freguesia names in uppercase
              averagePrice_a = myResults[i].houses_in_group_freguesia_alugar;
              averagePrice_c = myResults[i].houses_in_group_freguesia_comprar;
              break;
