@@ -46,9 +46,9 @@ class HouseController < ApplicationController
           houses_in_group_districts = calculated_results_alugar[distrito]
           unless houses_in_group_districts
             houses_in_group_districts_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
-            houses_in_group_districts_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
+            houses_in_group_districtos_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
             calculated_results_alugar[distrito] = {houses_in_group_districts_alugar: houses_in_group_districts_alugar,
-            houses_in_group_districts_comprar: houses_in_group_districts_comprar}
+            houses_in_group_districtos_comprar: houses_in_group_districtos_comprar}
           end
         
           # Check if the results for concelho are already calculated
@@ -73,10 +73,10 @@ class HouseController < ApplicationController
           { distrito: distrito,  
             concelho: concelho,  
             freguesia: freguesia,  
-            houses_in_group_districts_alugar: houses_in_group_districts_alugar.nil? ? nil : houses_in_group_districts_alugar.round(2),  
+            houses_in_group_distrito_alugar: houses_in_group_distrito_alugar.nil? ? nil : houses_in_group_distrito_alugar.round(2),  
             houses_in_group_concelho_alugar: houses_in_group_concelho_alugar.nil? ? nil : houses_in_group_concelho_alugar.round(2),  
             houses_in_group_freguesia_alugar: houses_in_group_freguesia_alugar.nil? ? nil : houses_in_group_freguesia_alugar.round(2),  
-            houses_in_group_districts_comprar: houses_in_group_districts_comprar.nil? ? nil : houses_in_group_districts_comprar.round(2),  
+            houses_in_group_distrito_comprar: houses_in_group_distrito_comprar.nil? ? nil : houses_in_group_distrito_comprar.round(2),  
             houses_in_group_concelho_comprar: houses_in_group_concelho_comprar.nil? ? nil : houses_in_group_concelho_comprar.round(2),  
             houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar.nil? ? nil : houses_in_group_freguesia_comprar.round(2)
           }

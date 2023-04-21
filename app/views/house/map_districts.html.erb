@@ -31,6 +31,7 @@
     <%= javascript_include_tag 'leaflet' %>
     <div id="map"></div>
     <script>
+    
       var mymap = L.map('map').setView([38.736946, -9.142685], 6);
       var myResults = <%= results.to_json.html_safe %>;
 
@@ -39,9 +40,20 @@
        maxZoom: 18
       }).addTo(mymap);
 
-      var districtsData, concelhosData, freguesiasData;
+      var distritosData, concelhosData, freguesiasData;
 
       // Initialize GeoJSON layers
+      distritosData = L.geoJSON(null, {
+       style: function(feature) {
+         return {
+           color: "white",
+           fillColor: "#FEB24C",
+           fillOpacity: 0.5
+         };
+       }
+      });
+
+
       concelhosData = L.geoJSON(null, {
        style: function(feature) {
          return {
@@ -62,169 +74,85 @@
        }
       });
 
-      // Load GeoJSON data for Portugal districts
-      $.getJSON("geojson/ContinenteDistritos.geojson", function(data) {
-       districtsData = L.geoJSON(data, {
-         onEachFeature: function(feature, layer) {
-           var district = feature.properties.Distrito.toUpperCase(); // Convert district name to uppercase
-           var averagePrice_a = null;
-           var averagePrice_c = null;
-           // Loop through the results from the controller to find the average price for the current district
-           for (var i = 0; i < myResults.length; i++) {
-             if (myResults[i].distrito.replace(/Distrito de |Distrito do |Distrito da /g, '').toUpperCase() === district) { // Compare district names in uppercase
-               averagePrice_a = myResults[i].houses_in_group_districts_alugar;
-               averagePrice_c = myResults[i].houses_in_group_districts_comprar;
-               break;
-             }
-           }
-           layer.on({
-             mouseover: function(e) {
-               layer.bindPopup("District: " + district + "<br>Average Price Alugar: " + averagePrice_a + "<br>Average Price Comprar: " + averagePrice_c).openPopup();
-             },
-             mouseout: function(e) {
-               layer.closePopup();
-             }
-           });
-         },
+ // Define combined function for style and event listeners
+function styleAndEventListeners(feature, layer, typeLayer) {
+  var maxAveragePrice = 1000000; // Set maximum value for scaling
+  if (typeLayer == "concelho") {
+    var typefeature = feature.properties.NAME_2;
+  } else if (typeLayer == "freguesia"){
+    var typefeature = feature.properties.NAME_3;
+  }else if (typeLayer == "distrito"){
+    var typefeature = feature.properties.Distrito;
+  }
+  
+  var averagePrice_a = null;
+  var averagePrice_c = null;
 
-         style: function(feature) {
-           var averagePrice_a = null;
-           var averagePrice_c = null;
-           var maxAveragePrice = 1000000; // Set maximum value for scaling
-           var district = feature.properties.Distrito.toUpperCase(); // Convert district name to uppercase
-           // Loop through the results from the controller to find the average price for the current district
-           for (var i = 0; i < myResults.length; i++) {
-             if (myResults[i].distrito.replace(/Distrito de |Distrito do |Distrito da /g, '').toUpperCase() === district) { // Compare district names in uppercase
-               averagePrice_a = myResults[i].houses_in_group_districts_alugar;
-               averagePrice_c = myResults[i].houses_in_group_districts_comprar;
-               break;
-             }
-           }
-           var averagePrice = Math.max(averagePrice_a, averagePrice_c);
-           var value = averagePrice / maxAveragePrice;
-           return {
-             color: "white",
-             fillColor: averagePrice !== null ? colorScale(value) : "transparent", // Set to transparent if there are no results
-             fillOpacity: 0.5
-           };
-         }
-       }).addTo(mymap); // Add to map after data is loaded
-      });
+  // Loop through the results from the controller to find the average price for the current freguesia
+  for (var i = 0; i < myResults.length; i++) {
+    if (myResults[i][typeLayer] && myResults[i][typeLayer].replace(/Distrito de |Distrito do |Distrito da /g, '').replace(/\s+/g, '').toUpperCase() === typefeature.replace(/\s+/g, '').toUpperCase()) { // Compare freguesia names in uppercase
+      averagePrice_a = myResults[i]["houses_in_group_" + typeLayer + "_alugar"];
+      averagePrice_c = myResults[i]["houses_in_group_" + typeLayer + "_comprar"];
+      break;
+    }
+  }
 
+  var averagePrice = Math.max(averagePrice_a, averagePrice_c);
+  var value = averagePrice / maxAveragePrice;
 
+  layer.setStyle({
+    color: "white",
+    fillColor: averagePrice !== null ? colorScale(value) : "transparent", // Set to transparent if there are no results
+    fillOpacity: 0.5
+  });
 
+  layer.on({
+    mouseover: function(e) {
+      // Access the global variables here
+      layer.bindPopup(typeLayer + ": " + typefeature + "<br>Average Price Alugar: " + averagePrice_a + "<br>Average Price Comprar: " + averagePrice_c).openPopup();
+    },
+    mouseout: function(e) {
+      layer.closePopup();
+    }
 
-      // Load GeoJSON data for Portugal concelhos
-      $.getJSON("geojson/ContinenteConcelhos.geojson", function(data) {
-       concelhosData.addData(data); // Add data to existing layer
-      // Define style function
-       function style(feature) {
-         var maxAveragePrice = 1000000; // Set maximum value for scaling
-         var concelho = feature.properties.NAME_2;
-         // Declare global variables
-         var averagePrice_a = null;
-         var averagePrice_c = null;
-         // Loop through the results from the controller to find the average price for the current freguesia
-         for (var i = 0; i < myResults.length; i++) {
-           if (myResults[i].concelho.replace(/\s+/g, '').toUpperCase() === concelho.toUpperCase()) {
-             averagePrice_a = myResults[i].houses_in_group_concelho_alugar;
-             averagePrice_c = myResults[i].houses_in_group_concelho_comprar;
-             break;
-           }
-         }
-         var averagePrice = Math.max(averagePrice_a, averagePrice_c);
-         var value = averagePrice / maxAveragePrice;
-         return {
-           color: "white",
-           fillColor: averagePrice !== null ? colorScale(value) : "transparent", // Set to transparent if there are no results
-           fillOpacity: 0.5
-         };
-       }
+  });
+  
+  if (typeLayer == "distrito"){
+      layer.addTo(mymap);
+  }
+}
 
-         // Set the style function for freguesiasData layer
-       concelhosData.setStyle(style);
+// Load GeoJSON data for Portugal distrito
+$.getJSON("geojson/ContinenteDistritos.geojson", function(data) {
+  distritosData.addData(data); // Add data to existing layer
 
-       // Add mouseover and mouseout event listeners to concelhosData layer
-       concelhosData.eachLayer(function(layer) {
-         var concelho = layer.feature.properties.NAME_2;
-         var averagePrice_a = null;
-         var averagePrice_c = null;
-         // Loop through the results from the controller to find the average price for the current concelho
-         for (var i = 0; i < myResults.length; i++) {
-           if (myResults[i].concelho.replace(/\s+/g, '').toUpperCase() === concelho.toUpperCase()) {
-             averagePrice_a = myResults[i].houses_in_group_concelho_alugar;
-             averagePrice_c = myResults[i].houses_in_group_concelho_comprar;
-             break;
-           }
-         }
-         layer.on({
-           mouseover: function(e) {
-             layer.bindPopup("Concelho: " + concelho + "<br>Average Price Alugar: " + averagePrice_a+ "<br>Average Price Comprar: " + averagePrice_c).openPopup();
-           },
-           mouseout: function(e) {
-             layer.closePopup();
-           }
-         });
-       });
-      });
+  // Call the combined function for each layer
+  distritosData.eachLayer(function(layer) {
+    styleAndEventListeners(layer.feature, layer, "distrito");
+  });
+});
 
 
-      // Load GeoJSON data for Portugal freguesias
-      $.getJSON("geojson/ContinenteFreguesias.geojson", function(data) {
-       freguesiasData.addData(data); // Add data to existing layer
+// Load GeoJSON data for Portugal freguesias
+$.getJSON("geojson/ContinenteFreguesias.geojson", function(data) {
+  freguesiasData.addData(data); // Add data to existing layer
 
-       // Define style function
-       function style(feature) {
-         var maxAveragePrice = 1000000; // Set maximum value for scaling
-         var freguesia = feature.properties.NAME_3;
-         // Declare global variables
-         var averagePrice_a = null;
-         var averagePrice_c = null;
-         // Loop through the results from the controller to find the average price for the current freguesia
-         for (var i = 0; i < myResults.length; i++) {
-           if (myResults[i].freguesia && myResults[i].freguesia.replace(/\s+/g, '').toUpperCase() === freguesia.toUpperCase()) { // Compare freguesia names in uppercase
-             averagePrice_a = myResults[i].houses_in_group_freguesia_alugar;
-             averagePrice_c = myResults[i].houses_in_group_freguesia_comprar;
-             break;
-           }
-         }
-         var averagePrice = Math.max(averagePrice_a, averagePrice_c);
-         var value = averagePrice / maxAveragePrice;
-         return {
-           color: "white",
-           fillColor: averagePrice !== null ? colorScale(value) : "transparent", // Set to transparent if there are no results
-           fillOpacity: 0.5
-         };
-       }
+  // Call the combined function for each layer
+  freguesiasData.eachLayer(function(layer) {
+    styleAndEventListeners(layer.feature, layer, "freguesia");
+  });
+});
 
-       // Set the style function for freguesiasData layer
-       freguesiasData.setStyle(style);
 
-       // Add mouseover and mouseout event listeners to freguesiasData layer
-       freguesiasData.eachLayer(function(layer) {
-         var freguesia = layer.feature.properties.NAME_3;
-         var averagePrice_a = null;
-         var averagePrice_c = null;
+// Load GeoJSON data for Portugal concelhos
+$.getJSON("geojson/ContinenteConcelhos.geojson", function(data) {
+  concelhosData.addData(data); // Add data to existing layer
 
-         for (var i = 0; i < myResults.length; i++) {
-           if (myResults[i].freguesia && myResults[i].freguesia.toUpperCase() === freguesia.toUpperCase()) { // Compare freguesia names in uppercase
-             averagePrice_a = myResults[i].houses_in_group_freguesia_alugar;
-             averagePrice_c = myResults[i].houses_in_group_freguesia_comprar;
-             break;
-           }
-         }
-         layer.on({
-           mouseover: function(e) {
-             // Access the global variables here
-             layer.bindPopup("Freguesia: " + freguesia + "<br>Average Price Alugar: " + averagePrice_a + "<br>Average Price Comprar: " + averagePrice_c).openPopup();
-           },
-           mouseout: function(e) {
-             layer.closePopup();
-           }
-         });
-       });
-      });
-
+  // Call the combined function for each layer
+  concelhosData.eachLayer(function(layer) {
+    styleAndEventListeners(layer.feature, layer, "concelho");
+  });
+});
 
 
       // Detect zoomend event and update displayed layers based on zoom level
@@ -233,24 +161,18 @@
        if (zoomLevel <= 8) {
          mymap.removeLayer(concelhosData);
          mymap.removeLayer(freguesiasData);
-         mymap.addLayer(districtsData);
+         mymap.addLayer(distritosData);
        } else if (zoomLevel > 8 && zoomLevel <= 10) {
-         mymap.removeLayer(districtsData);
+         mymap.removeLayer(distritosData);
          mymap.removeLayer(freguesiasData);
          mymap.addLayer(concelhosData);
        } else if (zoomLevel > 10) {
-         mymap.removeLayer(districtsData);
+         mymap.removeLayer(distritosData);
          mymap.removeLayer(concelhosData);
          mymap.addLayer(freguesiasData);
        }
       });
 
-
-      var layerControl = L.control.layers(null, {
-       "Districts": districtsData,
-       "Concelhos": concelhosData,
-       "Freguesias": freguesiasData
-      }).addTo(mymap);
 
 
       // Define a color scale function
@@ -269,6 +191,7 @@
        // Return the color at the specified index
        return colors[colorIndex];
       }
+      
     </script>
   </body>
 </html>
