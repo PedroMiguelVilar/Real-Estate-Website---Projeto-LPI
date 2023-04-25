@@ -65,11 +65,29 @@ class HouseController < ApplicationController
             houses_in_group_concelho_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
             houses_in_group_concelho_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
  
-
             houses_in_group_freguesia_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
             houses_in_group_freguesia_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
 
-        
+            # Calculate sum of Area_Util for each location
+            sum_area_distrito_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").sum(:Area_Util)
+            sum_area_concelho_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").sum(:Area_Util)
+            sum_area_freguesia_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").sum(:Area_Util)
+
+            sum_area_distrito_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").sum(:Area_Util)
+            sum_area_concelho_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").sum(:Area_Util)
+            sum_area_freguesia_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").sum(:Area_Util)
+
+            # If sum is null, calculate sum of Area_Bruta as fallback
+            sum_area_distrito_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").sum(:Area_Bruta)
+            sum_area_concelho_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").sum(:Area_Bruta)
+            sum_area_freguesia_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").sum(:Area_Bruta)
+
+            sum_area_distrito_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").sum(:Area_Bruta)
+            sum_area_concelho_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").sum(:Area_Bruta)
+            sum_area_freguesia_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").sum(:Area_Bruta)
+
+
+
             # Store the results in a hash
             { distrito: distrito,  
               concelho: concelho,  
@@ -79,7 +97,13 @@ class HouseController < ApplicationController
               houses_in_group_freguesia_alugar: houses_in_group_freguesia_alugar.nil? ? nil : houses_in_group_freguesia_alugar.round(2),  
               houses_in_group_distrito_comprar: houses_in_group_distrito_comprar.nil? ? nil : houses_in_group_distrito_comprar.round(2),  
               houses_in_group_concelho_comprar: houses_in_group_concelho_comprar.nil? ? nil : houses_in_group_concelho_comprar.round(2),  
-              houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar.nil? ? nil : houses_in_group_freguesia_comprar.round(2)
+              houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar.nil? ? nil : houses_in_group_freguesia_comprar.round(2),
+              sum_area_distrito_a: sum_area_distrito_a,
+              sum_area_concelho_a:  sum_area_concelho_a,
+              sum_area_freguesia_a:  sum_area_freguesia_a,
+              sum_area_distrito_c: sum_area_distrito_c,
+              sum_area_concelho_c:  sum_area_concelho_c,
+              sum_area_freguesia_c:  sum_area_freguesia_c
             }
 
           end
