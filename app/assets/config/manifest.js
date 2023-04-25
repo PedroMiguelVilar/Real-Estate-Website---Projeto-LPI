@@ -7,4 +7,3 @@
 //= link leaflet-search.js
 //= link leaflet.draw.js
 //= link populate_selectedmarkers.js
-//= link leaflet.markercluster-src.js

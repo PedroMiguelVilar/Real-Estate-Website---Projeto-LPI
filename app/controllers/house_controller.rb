@@ -27,62 +27,64 @@ class HouseController < ApplicationController
         results = JSON.parse(file.read)
         file.close
         render :map_districts, locals: { results: results }
+        puts "server side done!"
         return
       elsif
 
         houses = House.all
 
-        # Create a hash to store the calculated results
-        calculated_results_alugar = {}
-        
-        results = houses.map do |house|
-          localization = house.Localizacao
-          parts = localization.split(',').map(&:strip).reverse
-          distrito = parts[0]
-          concelho = parts[1]
-          freguesia = parts[2]
-        
-          # Check if the results for districto are already calculated
-          houses_in_group_districts = calculated_results_alugar[distrito]
-          unless houses_in_group_districts
-            houses_in_group_districts_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
-            houses_in_group_districtos_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
-            calculated_results_alugar[distrito] = {houses_in_group_districts_alugar: houses_in_group_districts_alugar,
-            houses_in_group_districtos_comprar: houses_in_group_districtos_comprar}
-          end
-        
-          # Check if the results for concelho are already calculated
-          houses_in_group_concelho = calculated_results_alugar[concelho]
-          unless houses_in_group_concelho
+          # Create a set to store the calculated hashes
+          calculated_hashes = Set.new
+
+          # Create a hash to store the calculated results
+          calculated_results_alugar = {}
+
+          results = houses.map do |house|
+            localization = house.Localizacao
+            parts = localization.split(',').map(&:strip).reverse
+            distrito = parts[0]
+            concelho = parts[1]
+            freguesia = parts[2]
+          
+            # Create a hash for this location
+            location_hash = {freguesia: freguesia}
+
+            # Check if we've already calculated this hash
+            if calculated_hashes.include?(location_hash)
+              next # Skip this house
+            else
+          
+            # Add this hash to the set of calculated hashes
+            calculated_hashes.add(location_hash)
+             
+
+            houses_in_group_distrito_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
+            houses_in_group_distrito_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
+
+          
             houses_in_group_concelho_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
             houses_in_group_concelho_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
-            calculated_results_alugar[concelho] = {houses_in_group_concelho_alugar: houses_in_group_concelho_alugar,
-              houses_in_group_concelho_comprar: houses_in_group_concelho_comprar}
-          end
-        
-          # Check if the results for freguesia are already calculated
-          houses_in_group_freguesia = calculated_results_alugar[freguesia]
-          unless houses_in_group_freguesia
+ 
+
             houses_in_group_freguesia_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
             houses_in_group_freguesia_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
-            calculated_results_alugar[freguesia] = {houses_in_group_freguesia_alugar: houses_in_group_freguesia_alugar,
-              houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar}
-          end
-        
-          # Store the results in a hash
-          { distrito: distrito,  
-            concelho: concelho,  
-            freguesia: freguesia,  
-            houses_in_group_distrito_alugar: houses_in_group_distrito_alugar.nil? ? nil : houses_in_group_distrito_alugar.round(2),  
-            houses_in_group_concelho_alugar: houses_in_group_concelho_alugar.nil? ? nil : houses_in_group_concelho_alugar.round(2),  
-            houses_in_group_freguesia_alugar: houses_in_group_freguesia_alugar.nil? ? nil : houses_in_group_freguesia_alugar.round(2),  
-            houses_in_group_distrito_comprar: houses_in_group_distrito_comprar.nil? ? nil : houses_in_group_distrito_comprar.round(2),  
-            houses_in_group_concelho_comprar: houses_in_group_concelho_comprar.nil? ? nil : houses_in_group_concelho_comprar.round(2),  
-            houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar.nil? ? nil : houses_in_group_freguesia_comprar.round(2)
-          }
 
-       
+        
+            # Store the results in a hash
+            { distrito: distrito,  
+              concelho: concelho,  
+              freguesia: freguesia,  
+              houses_in_group_distrito_alugar: houses_in_group_distrito_alugar.nil? ? nil : houses_in_group_distrito_alugar.round(2),  
+              houses_in_group_concelho_alugar: houses_in_group_concelho_alugar.nil? ? nil : houses_in_group_concelho_alugar.round(2),  
+              houses_in_group_freguesia_alugar: houses_in_group_freguesia_alugar.nil? ? nil : houses_in_group_freguesia_alugar.round(2),  
+              houses_in_group_distrito_comprar: houses_in_group_distrito_comprar.nil? ? nil : houses_in_group_distrito_comprar.round(2),  
+              houses_in_group_concelho_comprar: houses_in_group_concelho_comprar.nil? ? nil : houses_in_group_concelho_comprar.round(2),  
+              houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar.nil? ? nil : houses_in_group_freguesia_comprar.round(2)
+            }
+
+          end
         end
+
 
         File.open('price_a_c.json', 'w') do |file|
           file.write(results.to_json)

@@ -5,4 +5,3 @@
 //= require leaflet-search
 //= require leaflet.draw
 //= require populate_selectedmarkers
-//= require leaflet.markercluster-src
