@@ -13,6 +13,17 @@ class UsersController < ApplicationController
     end
   end
 
+  def search
+    if current_user
+      @saved_searches = current_user.searches
+    else
+      redirect_to root_path, alert: "You need to sign in or sign up before continuing."
+    end
+  end
+  
+  
+
+
 
   def new
       @user = User.new

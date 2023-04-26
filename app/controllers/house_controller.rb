@@ -249,6 +249,7 @@ class HouseController < ApplicationController
       query_params_1[:Logradouro] = params[:Logradouro] if params[:Logradouro].present?
       has_price = false
       has_year = false
+      
       if params[:min_price].present? && params[:max_price].present?
         min_price = params[:min_price].to_i
         max_price = params[:max_price].to_i
@@ -309,8 +310,45 @@ class HouseController < ApplicationController
       @houses_map = []
     end
     @image_urls = PagesController.new.scrape(@houses)
+
+    if params[:search].present?
+      @search_query = query_params.merge({ search: params[:search] })
+    else
+      @search_query = query_params_1
+    end
     
   end
+
+  def save_search
+    search_criteria = params[:search_params]
+    search_url = params[:search_url]
+  
+    existing_search = current_user.searches.find_by(search_criteria: search_criteria, url: search_url)
+    if existing_search
+      redirect_to request.referrer, alert: "You have already saved this search."
+    else
+      current_user.searches.create(search_criteria: search_criteria, url: search_url)
+      redirect_to request.referrer, notice: "Search added to favorites."
+    end
+  end
+  
+  
+  
+  
+  def delete_search
+    search_criteria = params[:search_params]
+    search = current_user.searches.find_by(search_criteria: search_criteria)
+    
+    if search
+      search.destroy
+      redirect_to request.referrer, notice: "Search removed from favorites!"
+    else
+      redirect_to request.referrer, alert: "Search not found."
+    end
+  end
+  
+  
+  
   
   private
   

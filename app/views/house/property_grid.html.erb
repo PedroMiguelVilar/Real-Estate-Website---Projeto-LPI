@@ -167,6 +167,7 @@
               <% end %>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="/users/<%= session[:user_id] %>/favourites">Favorites</a>
+                <a class="dropdown-item" href="/users/<%= session[:user_id] %>/searches">Searches</a>
               </div>
             </li>
           </li>
@@ -200,6 +201,21 @@
         <div class="col-md-12 col-lg-8">
           <div class="title-single-box">
             <h1 class="title-single">Properties found: <%=@houses.count %></h1>
+              <% if current_user %>
+                <% if current_user.searches.exists?(url: request.original_url) %>
+                  <%= form_tag(delete_search_path(id: current_user.id), method: :delete) do %>
+                    <%= hidden_field_tag :search_params, @search_query %>
+                    <%= hidden_field_tag :search_url, request.original_url %>
+                    <%= submit_tag 'Delete Search', class: 'btn btn-danger' %>
+                  <% end %>
+                <% else %>
+                  <%= form_tag(save_search_path(id: current_user.id), method: :post) do %>
+                    <%= hidden_field_tag :search_params, @search_query %>
+                    <%= hidden_field_tag :search_url, request.original_url %>
+                    <%= submit_tag "Save Search", class: "btn btn-primary" %>
+                  <% end %>
+                <% end %>
+              <% end %>
           </div>
         </div>
         <div class="col-md-12 col-lg-4">

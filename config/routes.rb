@@ -29,6 +29,11 @@ Rails.application.routes.draw do
   delete '/property_single/:id/unfavorite', to: 'house#unfavorite', as: 'unfavorite_house'
   
   get '/users/:id/favourites', to: 'users#favorites', as: 'user_favourites'
+  
+  get '/users/:id/searches', to: 'users#search', as: 'search'
+
+  post '/property-grid/:id/save_search', to: 'house#save_search', as: 'save_search'
+  delete '/property-grid/:id/delete_search', to: 'house#delete_search', as: 'delete_search'
 
   get '/map_districts', to: 'house#map_districts'
 
