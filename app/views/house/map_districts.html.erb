@@ -73,10 +73,8 @@
 
       var distritosData, concelhosData, freguesiasData;
 
-      distritosData = L.geoJSON(null, {});
-      
+      distritosData = L.geoJSON(null, {}); 
       concelhosData = L.geoJSON(null, {});
-      
       freguesiasData = L.geoJSON(null, {});
 
       // Get the table body element
@@ -180,7 +178,7 @@
         layer.setStyle({
           color: "white",
           fillColor: result_map.averagePrice_per_Area !== null ? colorScale(result_map.value) : "transparent", // Set to transparent if there are no results
-          fillOpacity: 1.7754 ,
+          fillOpacity: 0.75 ,
         });
 
         layer.on({
@@ -310,31 +308,34 @@
       loadGeoJSONData(freguesiasData, "geojson/ContinenteFreguesias.geojson", "freguesia", selectedType);
 
       var selectedLayer = "normal"; // Variable to store the selected layer
+      updateDisplayedLayer();
 
       document.getElementById('layerSelect').addEventListener('change', function() {
         selectedLayer = this.value; // Get the selected layer from the dropdown menu
         updateDisplayedLayer(); // Call a function to update the displayed layer
       });
 
-
-      mymap.on('zoomend', function() {
-        var zoomLevel = mymap.getZoom();
-        if (selectedLayer === 'normal') {
-          if (zoomLevel <= 8) {
-            mymap.removeLayer(concelhosData);
-            mymap.removeLayer(freguesiasData);
-            mymap.addLayer(distritosData);
-          } else if (zoomLevel > 8 && zoomLevel <= 10) {
-            mymap.removeLayer(distritosData);
-            mymap.removeLayer(freguesiasData);
-            mymap.addLayer(concelhosData);
-          } else if (zoomLevel > 10) {
-            mymap.removeLayer(distritosData);
-            mymap.removeLayer(concelhosData);
-            mymap.addLayer(freguesiasData);
+      function zoom_map(){
+        mymap.addLayer(distritosData);
+        mymap.on('zoomend', function() {
+          var zoomLevel = mymap.getZoom();
+          if (selectedLayer === 'normal') {
+            if (zoomLevel <= 8) {
+              mymap.removeLayer(concelhosData);
+              mymap.removeLayer(freguesiasData);
+              mymap.addLayer(distritosData);
+            } else if (zoomLevel > 8 && zoomLevel <= 10) {
+              mymap.removeLayer(distritosData);
+              mymap.removeLayer(freguesiasData);
+              mymap.addLayer(concelhosData);
+            } else if (zoomLevel > 10) {
+              mymap.removeLayer(distritosData);
+              mymap.removeLayer(concelhosData);
+              mymap.addLayer(freguesiasData);
+            }
           }
-        }
-      });
+        });
+      }
 
     function updateDisplayedLayer() {
       // Remove all layers from the map
@@ -352,6 +353,9 @@
           break;
         case 'concelhos':
           mymap.addLayer(concelhosData);
+          break;
+        case 'normal':
+          zoom_map();
           break;
         default:
           // Handle default case if needed
