@@ -22,8 +22,8 @@ class HouseController < ApplicationController
     
 
     def map_districts
-      if File.exist?('price_a_c.json')
-        file = File.open('price_a_c.json', 'r')
+      if File.exist?('values_places.json')
+        file = File.open('values_places.json', 'r')
         results = JSON.parse(file.read)
         file.close
         render :map_districts, locals: { results: results }

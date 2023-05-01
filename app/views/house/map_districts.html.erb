@@ -46,7 +46,6 @@
 
 
     <div id="map"></div>
-
 <table>
   <tr>
     <th>Distrito</th>
@@ -63,6 +62,7 @@
 
 
     <script>
+
       var mymap = L.map('map').setView([38.736946, -9.142685], 6);
       var myResults = <%= results.to_json.html_safe %>;
 
@@ -79,14 +79,6 @@
 
       // Get the table body element
       var tableBody = document.getElementById("distritosTableBody");
-
-      var sum_area_azores_a = null;
-      var sum_area_azores_c = null;
-      var averagePrice_a_azores = null;
-      var averagePrice_c_azores = null;
-
-      var azores_already_read = [];
-      var azores_already_read_prices = [];
 
 
       // Define combined function for style and event listeners
@@ -109,63 +101,36 @@
            break;
         }
         
-        var averagePrice_a = null;
-        var averagePrice_c = null;
-        var sum_area = null;
-        
+        let result_map, averagePrice_a, averagePrice_c;
 
-        // Loop through the results from the controller to find the average price for the current freguesia
         for (const result of myResults) {
-          if (result[typeLayer] && result[typeLayer].replace(/Ilha de |Ilha do |Ilha da /g, "").replace(/Distrito de |Distrito do |Distrito da /g, "").replace(/\s+/g, "").toUpperCase() === typefeature.replace(/\s+/g, "").toUpperCase() && result[typeLayer] !== "Azores") {
-            averagePrice_a = result["houses_in_group_" + typeLayer + "_alugar"];
-            averagePrice_c = result["houses_in_group_" + typeLayer + "_comprar"];
-            sum_area_a =  result["sum_area_" + typeLayer + "_a"];
-            sum_area_c = result["sum_area_" + typeLayer + "_c"];
-            if (typeof averagePrice_a === "string" && averagePrice_a.includes(",")) {
-              averagePrice_a = averagePrice_a.replace(",", ".");
+          if (result.typeLayer === typeLayer && result.typefeature === typefeature) {
+            switch(selectedType) {
+              case "RentBuym2":
+                result_map = result.results_valuesRB2;
+                break;
+              case "Buym2":
+                result_map = result.results_valuesB2;
+                break;
+              case "Rentm2":
+                result_map = result.results_valuesR2;
+                break;
+              default:
+                console.error(`Invalid selectedType: ${selectedType}`);
+                return;
             }
-            if (typeof averagePrice_c === "string" && averagePrice_c.includes(",")) {
-              averagePrice_c = averagePrice_c.replace(",", ".");
-            }
-            if (typeof sum_area_a === "string" && sum_area_a.includes(",")) {
-              sum_area_a = sum_area_a.replace(",", ".");
-            }
-            if (typeof sum_area_c === "string" && sum_area_c.includes(",")) {
-              sum_area_c = sum_area_c.replace(",", ".");
-            }
+
+            averagePrice_a = result.averagePrice_a;
+            averagePrice_c = result.averagePrice_c;
             break;
           }
-
-          if(result[typeLayer] === "Azores"){
-            if(!azores_already_read.includes(result.sum_area_distrito_a) && !azores_already_read.includes(result.sum_area_distrito_c) && !azores_already_read_prices.includes(result["houses_in_group_" + typeLayer + "_alugar"]) && !azores_already_read_prices.includes(result["houses_in_group_" + typeLayer + "_comprar"])){
-              if(result["houses_in_group_" + typeLayer + "_alugar"] !== null && result["houses_in_group_" + typeLayer + "_comprar"] !== null){
-                sum_area_azores_a += parseFloat(result.sum_area_distrito_a)
-                sum_area_azores_c += parseFloat(result.sum_area_distrito_c)
-                averagePrice_a_azores += parseFloat(result["houses_in_group_" + typeLayer + "_alugar"]);
-                averagePrice_c_azores += parseFloat(result["houses_in_group_" + typeLayer + "_comprar"]);
-                azores_already_read.push(result.sum_area_distrito);
-                azores_already_read_prices.push(result["houses_in_group_" + typeLayer + "_alugar"]);
-                azores_already_read_prices.push(result["houses_in_group_" + typeLayer + "_comprar"]);
-              }
-            }
-          }
-
         }
-
-        if(typefeature === "Azores"){
-          averagePrice_c = (averagePrice_c_azores/3).toFixed(2);
-          averagePrice_a = (averagePrice_a_azores/3).toFixed(2);
-          sum_area_a = sum_area_azores_a;
-          sum_area_c = sum_area_azores_c;
-        }
-
-
-        result_map = FillMap(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, selectedType, typeLayer);
-
 
         paintlayer(result_map, typeLayer, layer, typefeature, averagePrice_a, averagePrice_c);
 
       }
+
+      var reset_map = 0;
 
 
       function paintlayer(result_map, typeLayer, layer, typefeature, averagePrice_a, averagePrice_c){
@@ -182,28 +147,26 @@
           distritoCell.textContent = typefeature;
           averagePriceAlugarCell.textContent = averagePrice_a;
           averagePriceComprarCell.textContent = averagePrice_c;
-          averagePriceCell.textContent = result_map.averagePrice_per_Area;
-          valueCell.textContent = result_map.value;
-          areaCell_a.textContent = sum_area_a;
-          areaCell_c.textContent = sum_area_c;
+          valueCell.textContent = result_map;
           row.appendChild(distritoCell);
           row.appendChild(averagePriceAlugarCell);
           row.appendChild(averagePriceComprarCell);
-          row.appendChild(averagePriceCell);
           row.appendChild(valueCell);
           row.appendChild(areaCell_a);
           row.appendChild(areaCell_c);
           tableBody.appendChild(row);
         }
 
-        if(result_map.value > 1) {
-          result_map.value = 1; 
+        if (result_map === null) {
+          result_map = 0;
+        } else if (result_map > 1) {
+          result_map = 1;
         }
 
         layer.setStyle({
           color: "white",
-          fillColor: result_map.averagePrice_per_Area !== null ? colorScale(result_map.value) : "transparent", // Set to transparent if there are no results
-          fillOpacity: 0.75 ,
+          fillColor: result_map !== null ? colorScale(result_map) : "transparent", // Set to transparent if there are no results
+          fillOpacity: 0.75
         });
 
         layer.on({
@@ -226,98 +189,13 @@
         });
 
 
-        if (typeLayer == "distrito") {
+        if (typeLayer == "distrito" && reset_map==0) {
           layer.addTo(mymap);
+          reset_map = 1;
         }
       }
 
-      function FillMap(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, selectedType, typeLayer){
 
-        switch (typeLayer) {
-          case "distrito":
-            value_divide_rent_buy = 202.3165;
-            value_divide_buy = 2540.57;
-            value_divide_rent = 22.585 //change value from 225.85;
-           break;
-          case "concelho":
-           value_divide_rent_buy = 120.33;
-           value_divide_buy = 2371.81;
-           value_divide_rent = 130.31;
-           break;
-          case "freguesia":
-           value_divide_rent_buy = 37.19;
-           value_divide_buy = 977,53;
-           value_divide_rent = 42.88;
-           break;
-          default:
-           typefeature = null;
-           break;
-        }
-
-        // Apply new styles based on selectedType
-        switch (selectedType) {
-          case "RentBuym2":
-            result_map = RentBuym2(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, value_divide_rent_buy);
-            return result_map;
-            break;
-          case "Buym2":
-            result_map = Buym2(averagePrice_c, sum_area_c, value_divide_buy);
-            return result_map;
-            break;
-          case "Rentm2":
-            result_map = Rentm2(averagePrice_a, sum_area_a, value_divide_rent);
-            return result_map;
-            break;
-          default:
-            console.error(selectedType)
-            break;
-        }
-      }
-
-      function RentBuym2(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, value_divide_rent_buy){
-        var price_per_area_a = parseFloat(averagePrice_a/sum_area_a); 
-        var price_per_area_c = parseFloat(averagePrice_c/sum_area_c);
-
-        var getMax = Math.max(price_per_area_a, price_per_area_c);
-        var getMin = Math.min(price_per_area_a, price_per_area_c);
-
-        var averagePrice_per_Area = (parseFloat(getMax/getMin)).toFixed(2);
-        var value = parseFloat(averagePrice_per_Area/value_divide_rent_buy).toFixed(5); // Use linear scaling
-
-
-        var result = {
-          value: value,
-          averagePrice_per_Area: averagePrice_per_Area
-        };
-
-        return result;
-      }
-
-      function Buym2(averagePrice_c, sum_area_c, value_divide_buy){
-
-        var averagePrice_per_Area = parseFloat(averagePrice_c/sum_area_c).toFixed(2);
-        var value = parseFloat(averagePrice_per_Area/value_divide_buy).toFixed(5); // Use linear scaling
-
-        var result = {
-          value: value,
-          averagePrice_per_Area: averagePrice_per_Area
-        };
-
-        return result;
-      }
-
-      function Rentm2(averagePrice_a, sum_area_a, value_divide_rent){
-
-        var averagePrice_per_Area = parseFloat(averagePrice_a/sum_area_a).toFixed(2);
-        var value = parseFloat(averagePrice_per_Area/value_divide_rent).toFixed(5); // Use linear scaling
-
-        var result = {
-          value: value,
-          averagePrice_per_Area: averagePrice_per_Area
-        };
-
-        return result;
-      }
 
       // Define a function to load GeoJSON data, add it to a layer, and return a promise
       function loadGeoJSONAndProcess(layer, path, type) {
@@ -421,21 +299,25 @@
       loadGeoJSONData(freguesiasData, "geojson/ContinenteFreguesias.geojson", "freguesia", selectedType);
     }
 
-
-
-    // Define a color scale function
+    
     function colorScale(value) {
-     // Define an array of colors
-     var colors = ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"];
-     // Define a linear scale to map values to colors
-     var scale = d3.scaleLinear()
-       .domain([0, 1]) // Input domain
-       .range([0, colors.length - 1]); // Output range
-     // Use the scale to get the index of the color in the array
-     var colorIndex = Math.round(scale(value));
-     // Return the color at the specified index
-     return colors[colorIndex];
+      // Define an array of colors
+      var colors = ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"];
+      
+      if (value === null) {
+        return "transparent";
+      }
+      
+      // Define a linear scale to map values to colors
+      var scale = d3.scaleLinear()
+        .domain([0, 1]) // Input domain
+        .range([0, colors.length - 1]); // Output range
+      // Use the scale to get the index of the color in the array
+      var colorIndex = Math.round(scale(value));
+      // Return the color at the specified index
+      return colors[colorIndex];
     }
+
 
 
     </script>
