@@ -119,8 +119,20 @@
           if (result[typeLayer] && result[typeLayer].replace(/Ilha de |Ilha do |Ilha da /g, "").replace(/Distrito de |Distrito do |Distrito da /g, "").replace(/\s+/g, "").toUpperCase() === typefeature.replace(/\s+/g, "").toUpperCase() && result[typeLayer] !== "Azores") {
             averagePrice_a = result["houses_in_group_" + typeLayer + "_alugar"];
             averagePrice_c = result["houses_in_group_" + typeLayer + "_comprar"];
-            sum_area_a = result.sum_area_distrito_a; 
-            sum_area_c = result.sum_area_distrito_c; 
+            sum_area_a =  result["sum_area_" + typeLayer + "_a"];
+            sum_area_c = result["sum_area_" + typeLayer + "_c"];
+            if (typeof averagePrice_a === "string" && averagePrice_a.includes(",")) {
+              averagePrice_a = averagePrice_a.replace(",", ".");
+            }
+            if (typeof averagePrice_c === "string" && averagePrice_c.includes(",")) {
+              averagePrice_c = averagePrice_c.replace(",", ".");
+            }
+            if (typeof sum_area_a === "string" && sum_area_a.includes(",")) {
+              sum_area_a = sum_area_a.replace(",", ".");
+            }
+            if (typeof sum_area_c === "string" && sum_area_c.includes(",")) {
+              sum_area_c = sum_area_c.replace(",", ".");
+            }
             break;
           }
 
@@ -147,7 +159,16 @@
           sum_area_c = sum_area_azores_c;
         }
 
-        result_map = FillMap(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, selectedType);
+
+        result_map = FillMap(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, selectedType, typeLayer);
+
+
+        paintlayer(result_map, typeLayer, layer, typefeature, averagePrice_a, averagePrice_c);
+
+      }
+
+
+      function paintlayer(result_map, typeLayer, layer, typefeature, averagePrice_a, averagePrice_c){
         
         if(typeLayer == "distrito"){ 
           var row = document.createElement("tr");
@@ -173,6 +194,10 @@
           row.appendChild(areaCell_a);
           row.appendChild(areaCell_c);
           tableBody.appendChild(row);
+        }
+
+        if(result_map.value > 1) {
+          result_map.value = 1; 
         }
 
         layer.setStyle({
@@ -206,21 +231,41 @@
         }
       }
 
+      function FillMap(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, selectedType, typeLayer){
 
-      function FillMap(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, selectedType){
+        switch (typeLayer) {
+          case "distrito":
+            value_divide_rent_buy = 202.3165;
+            value_divide_buy = 2540.57;
+            value_divide_rent = 22.585 //change value from 225.85;
+           break;
+          case "concelho":
+           value_divide_rent_buy = 120.33;
+           value_divide_buy = 2371.81;
+           value_divide_rent = 130.31;
+           break;
+          case "freguesia":
+           value_divide_rent_buy = 37.19;
+           value_divide_buy = 977,53;
+           value_divide_rent = 42.88;
+           break;
+          default:
+           typefeature = null;
+           break;
+        }
 
         // Apply new styles based on selectedType
         switch (selectedType) {
           case "RentBuym2":
-            result_map = RentBuym2(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c);
+            result_map = RentBuym2(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, value_divide_rent_buy);
             return result_map;
             break;
           case "Buym2":
-            result_map = Buym2(averagePrice_c, sum_area_c);
+            result_map = Buym2(averagePrice_c, sum_area_c, value_divide_buy);
             return result_map;
             break;
           case "Rentm2":
-            result_map = Rentm2(averagePrice_a, sum_area_a);
+            result_map = Rentm2(averagePrice_a, sum_area_a, value_divide_rent);
             return result_map;
             break;
           default:
@@ -229,7 +274,7 @@
         }
       }
 
-      function RentBuym2(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c){
+      function RentBuym2(averagePrice_a, sum_area_a, averagePrice_c, sum_area_c, value_divide_rent_buy){
         var price_per_area_a = parseFloat(averagePrice_a/sum_area_a); 
         var price_per_area_c = parseFloat(averagePrice_c/sum_area_c);
 
@@ -237,7 +282,8 @@
         var getMin = Math.min(price_per_area_a, price_per_area_c);
 
         var averagePrice_per_Area = (parseFloat(getMax/getMin)).toFixed(2);
-        var value = parseFloat(averagePrice_per_Area/10).toFixed(5); // Use linear scaling
+        var value = parseFloat(averagePrice_per_Area/value_divide_rent_buy).toFixed(5); // Use linear scaling
+
 
         var result = {
           value: value,
@@ -247,10 +293,10 @@
         return result;
       }
 
-      function Buym2(averagePrice_c, sum_area_c){
+      function Buym2(averagePrice_c, sum_area_c, value_divide_buy){
 
         var averagePrice_per_Area = parseFloat(averagePrice_c/sum_area_c).toFixed(2);
-        var value = parseFloat(averagePrice_per_Area/10).toFixed(5); // Use linear scaling
+        var value = parseFloat(averagePrice_per_Area/value_divide_buy).toFixed(5); // Use linear scaling
 
         var result = {
           value: value,
@@ -260,10 +306,10 @@
         return result;
       }
 
-      function Rentm2(averagePrice_a, sum_area_a){
+      function Rentm2(averagePrice_a, sum_area_a, value_divide_rent){
 
         var averagePrice_per_Area = parseFloat(averagePrice_a/sum_area_a).toFixed(2);
-        var value = parseFloat(averagePrice_per_Area).toFixed(5); // Use linear scaling
+        var value = parseFloat(averagePrice_per_Area/value_divide_rent).toFixed(5); // Use linear scaling
 
         var result = {
           value: value,
