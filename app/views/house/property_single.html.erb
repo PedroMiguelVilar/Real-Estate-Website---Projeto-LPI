@@ -224,21 +224,55 @@
         </div>
       </div>
     </div>
-  </section>
+  </section>  
   <!--/ Intro Single End /-->
   <!--/ Property Single Star /-->
+
+<style>
+.carousel-item-b {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  height: 100%;
+}
+
+.image-wrapper {
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.image-wrapper img {
+  max-height: 100%;
+  max-width: 100%;
+  height: auto;
+  width: auto;
+  object-fit: contain;
+}
+</style>
   <section class="property-single nav-arrow-b">
     <div class="container">
       <div class="row">
         <div class="col-sm-12">
-          <div id="property-single-carousel" class="owl-carousel owl-arrow gallery-property">
-            <% @image_urls.each do |image| %>
-              <% if image.present?%>
-                <div class="carousel-item-b">
-                  <img src="<%= image %>" alt="" style="width: 1440px !important; height: 1080px !important;">
-                </div>
-              <%end%>
-            <%end%>
+        <% if @image_urls.present? %>
+        <div id="property-single-carousel" class="owl-carousel owl-arrow gallery-property" style="width: 1080px !important; height: 810px !important;">
+          <% @image_urls.each do |image| %>
+            <% if image.present? %>
+            <div class="carousel-item-b">
+              <div class="image-wrapper">
+              <img src="<%= image %>" alt="" style="width: 1080px !important; height: 810px !important;">
+              </div>
+            </div>
+            <% end %>
+          <% end %>
+        </div>
+        <% end %>
+
+
           </div>
           <div class="row justify-content-between">
             <div class="col-md-5 col-lg-4">

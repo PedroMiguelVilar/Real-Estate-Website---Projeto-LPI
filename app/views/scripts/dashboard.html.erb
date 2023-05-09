@@ -1,0 +1,8 @@
+<!-- app/views/scripts/index.html.erb -->
+
+<h1>Scripts</h1>
+
+<!-- Add a form to submit a request to the 'run_script' action -->
+<%= form_tag(run_script_path, method: :post) do %>
+  <%= submit_tag 'Run Script' %>
+<% end %>

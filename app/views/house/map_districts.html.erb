@@ -71,14 +71,39 @@
        maxZoom: 18
       }).addTo(mymap);
 
-      var distritosData, concelhosData, freguesiasData;
 
-      distritosData = L.geoJSON(null, {}); 
-      concelhosData = L.geoJSON(null, {});
-      freguesiasData = L.geoJSON(null, {});
-
+      var distritosData = L.geoJSON(null, {onEachFeature: onDistritoClick}); 
+      var concelhosData = L.geoJSON(null, {onEachFeature: onConcelhoClick, style: { visibility: "hidden" }});
+      var freguesiasData = L.geoJSON(null, { style: { visibility: "hidden" }});
+    
       // Get the table body element
       var tableBody = document.getElementById("distritosTableBody");
+
+      function onDistritoClick(feature, layer) {
+          layer.on('click', function() {
+          // zoom to the clicked feature
+          mymap.fitBounds(layer.getBounds());
+        
+          // hide the distrito layer
+          distritosData.setStyle({ visibility: "hidden" });
+        
+          // show the concelho layer
+          concelhosData.setStyle({ visibility: "visible" });
+        });
+      }
+
+      function onConcelhoClick(feature, layer) {
+        layer.on('click', function() {
+        // zoom to the clicked feature
+        mymap.fitBounds(layer.getBounds());
+        
+        // hide the concelho layer
+        concelhosData.setStyle({ visibility: "hidden" });
+        
+        // show the freguesia layer
+        freguesiasData.setStyle({ visibility: "visible" });
+        });
+      }
 
 
       // Define combined function for style and event listeners
@@ -226,7 +251,7 @@
 
       
       var selectedType = "RentBuym2"
-
+  
       loadGeoJSONData(distritosData, "geojson/ContinenteDistritos.geojson", "distrito", selectedType);
       loadGeoJSONData(concelhosData, "geojson/ContinenteConcelhos.geojson", "concelho", selectedType);
       loadGeoJSONData(freguesiasData, "geojson/ContinenteFreguesias.geojson", "freguesia", selectedType);

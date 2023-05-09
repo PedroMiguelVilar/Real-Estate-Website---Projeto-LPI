@@ -37,4 +37,9 @@ Rails.application.routes.draw do
 
   get '/map_districts', to: 'house#map_districts'
 
+  get '/scripts', to: 'scripts#index'
+  post '/scripts/run', to: 'scripts#run_script', as: :run_script
+  
+
+
 end
