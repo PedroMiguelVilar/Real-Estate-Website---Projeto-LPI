@@ -19,108 +19,268 @@ class HouseController < ApplicationController
     def about
       render :about
     end
-    
 
-    def map_districts
-      if File.exist?('values_places.json')
-        file = File.open('values_places.json', 'r')
-        results = JSON.parse(file.read)
-        file.close
-        render :map_districts, locals: { results: results }
-        puts "server side done!"
-        return
-      elsif
+    def read_geojson(filename)
+      json_data = JSON.parse(File.read("public/geojson/#{filename}.geojson"))
+      features = json_data['features']
+    end
 
-        houses = House.all
-
-          # Create a set to store the calculated hashes
-          calculated_hashes = Set.new
-
-          # Create a hash to store the calculated results
-          calculated_results_alugar = {}
-
-          results = houses.map do |house|
-            localization = house.Localizacao
-            parts = localization.split(',').map(&:strip).reverse
-            distrito = parts[0]
-            concelho = parts[1]
-            freguesia = parts[2]
-          
-            # Create a hash for this location
-            location_hash = {freguesia: freguesia}
-
-            # Check if we've already calculated this hash
-            if calculated_hashes.include?(location_hash)
-              next # Skip this house
-            else
-          
-            # Add this hash to the set of calculated hashes
-            calculated_hashes.add(location_hash)
-             
-
-            houses_in_group_distrito_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
-            houses_in_group_distrito_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
-
-          
-            houses_in_group_concelho_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
-            houses_in_group_concelho_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
- 
-            houses_in_group_freguesia_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
-            houses_in_group_freguesia_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
-
-            # Calculate sum of Area_Util for each location
-            sum_area_distrito_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Util)
-            sum_area_concelho_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Util)
-            sum_area_freguesia_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Util)
-
-            sum_area_distrito_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Util)
-            sum_area_concelho_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Util)
-            sum_area_freguesia_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Util)
-
-            # If sum is null, calculate sum of Area_Bruta as fallback
-            sum_area_distrito_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Bruta)
-            sum_area_concelho_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Bruta)
-            sum_area_freguesia_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Bruta)
-
-            sum_area_distrito_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Bruta)
-            sum_area_concelho_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Bruta)
-            sum_area_freguesia_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Bruta)
-
-
-
-            # Store the results in a hash
-            { distrito: distrito,  
-              concelho: concelho,  
-              freguesia: freguesia,  
-              houses_in_group_distrito_alugar: houses_in_group_distrito_alugar.nil? ? nil : houses_in_group_distrito_alugar.round(2),  
-              houses_in_group_concelho_alugar: houses_in_group_concelho_alugar.nil? ? nil : houses_in_group_concelho_alugar.round(2),  
-              houses_in_group_freguesia_alugar: houses_in_group_freguesia_alugar.nil? ? nil : houses_in_group_freguesia_alugar.round(2),  
-              houses_in_group_distrito_comprar: houses_in_group_distrito_comprar.nil? ? nil : houses_in_group_distrito_comprar.round(2),  
-              houses_in_group_concelho_comprar: houses_in_group_concelho_comprar.nil? ? nil : houses_in_group_concelho_comprar.round(2),  
-              houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar.nil? ? nil : houses_in_group_freguesia_comprar.round(2),
-              sum_area_distrito_a: sum_area_distrito_a,
-              sum_area_concelho_a:  sum_area_concelho_a,
-              sum_area_freguesia_a:  sum_area_freguesia_a,
-              sum_area_distrito_c: sum_area_distrito_c,
-              sum_area_concelho_c:  sum_area_concelho_c,
-              sum_area_freguesia_c:  sum_area_freguesia_c
-            }
-
-          end
-        end
-
-
-        File.open('price_a_c.json', 'w') do |file|
-          file.write(results.to_json)
-        end
-
-      # Render the results or perform other actions with the results as needed
-      
-      render :map_districts, locals: { results: results }
+    def determine_typelayer(filename)
+      case filename
+      when "ContinenteDistritos"
+        "distrito"
+      when "ContinenteConcelhos"
+        "concelho"
+      when "ContinenteFreguesias"
+        "freguesia"
       end
     end
 
+
+
+
+    def compare_geojson_values(results, feature, typelayer, total_values, values_places)
+      case typelayer
+      when "distrito"
+        typefeature = feature['properties']['NAME_1']
+        layer_totals = total_values[:distritos]
+      when "concelho"
+        typefeature = feature['properties']['NAME_2']
+        layer_totals = total_values[:concelhos]
+      when "freguesia"
+        typefeature = feature['properties']['NAME_3']
+        layer_totals = total_values[:freguesias]
+      end
     
+      # Use a set to keep track of already added places for this typelayer
+      added_places = total_values["#{typelayer}_added_places".to_sym] || Set.new
+    
+      results.each do |result|
+        if result&.[](typelayer) && result[typelayer].gsub(/Ilha de |Ilha do |Ilha da |Distrito de |Distrito do |Distrito da|\s+/,'').upcase == typefeature.gsub(/\s+/,'').upcase
+          
+          # Check if typefeature has already been processed for this typelayer, skip if yes
+          unless added_places.include?(typefeature)
+            layer_totals[:typelayer] = typelayer
+            layer_totals[:total_averagePrice_c] += result["houses_in_group_#{typelayer}_comprar"].to_f
+            layer_totals[:total_averagePrice_a] += result["houses_in_group_#{typelayer}_alugar"].to_f
+            layer_totals[:total_sum_area_a] += result["sum_area_#{typelayer}_a"].to_f
+            layer_totals[:total_sum_area_c] += result["sum_area_#{typelayer}_c"].to_f
+          
+            layer_totals[:total] += 1; 
+            added_places.add(typefeature)
+
+                
+            values_places << {
+              typefeature: typefeature,
+              typelayer: typelayer,
+              averagePrice_a: result["houses_in_group_#{typelayer}_alugar"],
+              averagePrice_c: result["houses_in_group_#{typelayer}_comprar"],
+              sum_area_a: result["sum_area_#{typelayer}_a"],
+              sum_area_c: result["sum_area_#{typelayer}_c"]
+            }
+          end
+        end
+      end
+    
+      # Update the set of added places for this typelayer in total_values
+      total_values["#{typelayer}_added_places".to_sym] = added_places
+    end
+    
+    
+    
+    
+    def calculate_value(values_place, total_values)
+
+      case values_place[:typelayer]
+      when "distrito"
+        layer_totals = total_values[:distritos]
+      when "concelho"
+        layer_totals = total_values[:concelhos]
+      when "freguesia"
+        layer_totals = total_values[:freguesias]
+      end
+
+        results = {}
+        results[:typefeature] = values_place[:typefeature]
+        results[:typeLayer] = values_place[:typelayer]
+        results[:averagePrice_c] = values_place[:averagePrice_c].to_f
+        results[:averagePrice_a] = values_place[:averagePrice_a].to_f
+        results[:sum_area_a] = values_place[:sum_area_a].to_f
+        results[:sum_area_c] = values_place[:sum_area_c].to_f
+
+        average_price_per_area_a_l = (values_place[:averagePrice_a].to_f / values_place[:sum_area_a].to_f).to_f
+        average_price_per_area_a_p = ((layer_totals[:total_averagePrice_a].to_f/layer_totals[:total].to_f) / (layer_totals[:total_sum_area_a].to_f/layer_totals[:total].to_f)).to_f
+        average_price_per_area_c_l = (values_place[:averagePrice_c].to_f / values_place[:sum_area_c].to_f).to_f
+        average_price_per_area_c_p = ((layer_totals[:total_averagePrice_c].to_f/layer_totals[:total].to_f) / (layer_totals[:total_sum_area_c].to_f/layer_totals[:total].to_f)).to_f
+
+        results[:results_valuesRB2] = ((((average_price_per_area_a_l/average_price_per_area_c_l).to_f)/(average_price_per_area_a_p/average_price_per_area_c_p).to_f).to_f)
+        if results[:results_valuesRB2].infinite? || results[:results_valuesRB2].nan? || results[:results_valuesRB2].nil?
+          results[:results_valuesRB2] = 0
+        end
+        
+        results[:results_valuesB2] = ((average_price_per_area_c_l/average_price_per_area_c_p).to_f)
+        if results[:results_valuesB2].infinite? || results[:results_valuesB2].nan? || results[:results_valuesB2].nil?
+          results[:results_valuesB2] = 0
+        end
+        
+        results[:results_valuesR2] = ((average_price_per_area_a_l/average_price_per_area_a_p).to_f)
+        if results[:results_valuesR2].infinite? || results[:results_valuesR2].nan? || results[:results_valuesR2].nil?
+          results[:results_valuesR2] = 0
+        end
+
+        return results
+    end
+    
+
+
+def map_districts
+  
+  if File.exist?('values_places.json')
+    file = File.open('values_places.json', 'r')
+    results = JSON.parse(file.read)
+    file.close
+    render :map_districts, locals: { results: results }
+    return
+  elsif
+
+    houses = House.all
+
+      # Create a set to store the calculated hashes
+      calculated_hashes = Set.new
+
+      # Create a hash to store the calculated results
+      calculated_results_alugar = {}
+
+      results = houses.map do |house|
+        localization = house.Localizacao
+        parts = localization.split(',').map(&:strip).reverse
+        distrito = parts[0]
+        concelho = parts[1]
+        freguesia = parts[2]
+      
+        # Create a hash for this location
+        location_hash = {freguesia: freguesia}
+
+        # Check if we've already calculated this hash
+        if calculated_hashes.include?(location_hash)
+          next # Skip this house
+        else
+      
+        # Add this hash to the set of calculated hashes
+        calculated_hashes.add(location_hash)
+         
+
+        houses_in_group_distrito_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
+        houses_in_group_distrito_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
+
+      
+        houses_in_group_concelho_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
+        houses_in_group_concelho_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
+
+        houses_in_group_freguesia_alugar = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
+        houses_in_group_freguesia_comprar = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
+
+        # Calculate sum of Area_Util for each location
+        sum_area_distrito_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Util)
+        sum_area_concelho_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Util)
+        sum_area_freguesia_a = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Util)
+
+        sum_area_distrito_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Util)
+        sum_area_concelho_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Util)
+        sum_area_freguesia_c = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Util)
+
+        # If sum is null, calculate sum of Area_Bruta as fallback
+        sum_area_distrito_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Bruta)
+        sum_area_concelho_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Bruta)
+        sum_area_freguesia_a ||= House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Bruta)
+
+        sum_area_distrito_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Area_Bruta)
+        sum_area_concelho_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Area_Bruta)
+        sum_area_freguesia_c ||= House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Area_Bruta)
+
+
+
+        # Store the results in a hash
+        { distrito: distrito,  
+          concelho: concelho,  
+          freguesia: freguesia,  
+          houses_in_group_distrito_alugar: houses_in_group_distrito_alugar.nil? ? nil : houses_in_group_distrito_alugar.round(2),  
+          houses_in_group_concelho_alugar: houses_in_group_concelho_alugar.nil? ? nil : houses_in_group_concelho_alugar.round(2),  
+          houses_in_group_freguesia_alugar: houses_in_group_freguesia_alugar.nil? ? nil : houses_in_group_freguesia_alugar.round(2),  
+          houses_in_group_distrito_comprar: houses_in_group_distrito_comprar.nil? ? nil : houses_in_group_distrito_comprar.round(2),  
+          houses_in_group_concelho_comprar: houses_in_group_concelho_comprar.nil? ? nil : houses_in_group_concelho_comprar.round(2),  
+          houses_in_group_freguesia_comprar: houses_in_group_freguesia_comprar.nil? ? nil : houses_in_group_freguesia_comprar.round(2),
+          sum_area_distrito_a: sum_area_distrito_a,
+          sum_area_concelho_a:  sum_area_concelho_a,
+          sum_area_freguesia_a:  sum_area_freguesia_a,
+          sum_area_distrito_c: sum_area_distrito_c,
+          sum_area_concelho_c:  sum_area_concelho_c,
+          sum_area_freguesia_c:  sum_area_freguesia_c
+        }
+
+      end
+    end
+  
+          
+    values_places = []
+    # Initialize the total values hashes
+    total_values = {
+      distritos: { typelayer: "distrito", total_averagePrice_c: 0, total_averagePrice_a: 0, total_sum_area_a: 0, total_sum_area_c: 0, total: 0},
+      concelhos: { typelayer: "concelho", total_averagePrice_c: 0, total_averagePrice_a: 0, total_sum_area_a: 0, total_sum_area_c: 0,total: 0 },
+      freguesias: { typelayer: "freguesia", total_averagePrice_c: 0, total_averagePrice_a: 0, total_sum_area_a: 0, total_sum_area_c: 0,total: 0 }
+    }
+
+    %w[ContinenteDistritos ContinenteConcelhos ContinenteFreguesias].each do |filename|
+      typelayer = determine_typelayer(filename)
+      features = read_geojson(filename)
+        features.each do |feature|
+          compare_geojson_values(results, feature, typelayer, total_values, values_places)
+        end
+    end
+
+
+      results = []
+      values_places.each do |values_place|
+        result = calculate_value(values_place, total_values)
+        results << result if result
+      end
+      
+      b2r2_values = results.map { |result| result[:results_valuesRB2] }
+      sum = b2r2_values.inject(0) { |result, value| result + value }
+      average_B2R2 = sum / b2r2_values.length.to_f
+      
+      b2_values = results.map { |result| result[:results_valuesB2] }
+      sum = b2_values.inject(0) { |result, value| result + value }
+      average_B2 = sum / b2_values.length.to_f
+      
+      r2_values = results.map { |result| result[:results_valuesR2] }
+      sum = r2_values.inject(0) { |result, value| result + value }
+      average_R2 = sum / r2_values.length.to_f
+      
+      
+      # Apply scaling based on the averages
+      b2r2_scaling = average_B2R2 < 0.1 ? 10 : (average_B2R2 > 1 ? 0.1 : (average_B2R2 > 0.1 ? 1 : 0.1))
+      b2_scaling = average_B2 < 0.1 ? 10 : (average_B2 > 1 ? 0.1 : (average_B2 > 0.1 ? 1 : 0.1))
+      r2_scaling = average_R2 < 0.1 ? 10 : (average_R2 > 1 ? 0.1 : (average_R2 > 0.1 ? 1 : 0.1))
+
+      results.each do |result|
+          result[:results_valuesRB2] = result[:results_valuesRB2] * b2r2_scaling 
+          result[:results_valuesB2] = result[:results_valuesB2] * b2_scaling 
+          result[:results_valuesR2] = result[:results_valuesR2] * r2_scaling 
+      end
+      
+
+
+      File.open('values_places.json', 'w') do |file|
+        file.write(results.to_json)
+      end
+
+      # Redirect back to the previous page
+      redirect_to(request.referrer || root_path)
+
+
+    end
+end
     
     helper_method :sort_column, :sort_direction
     def test

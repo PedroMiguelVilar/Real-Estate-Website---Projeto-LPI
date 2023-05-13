@@ -5,14 +5,14 @@ from bs4 import BeautifulSoup
 import time
 import os
 
-
+print("#1 python")
 # Check first time and if it has more results
 first_time = True
 no_results = False
 
 # Variables
-type_estate = {'apartamentos', 'moradias'}
-type_selling = {'comprar', 'alugar'}
+type_estate = {'moradias'}
+type_selling = {'alugar'}
 
 # Establish connection to database
 conn = sqlite3.connect('houses.sqlite3')
@@ -34,13 +34,7 @@ for x in type_estate:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
-            print(url)
             page = requests.get(url, headers=headers)
-
-            print(f"[[STATUS] | {str(page.status_code)}] || [{url}]\n\
-                  progress : {x}:{y} : {num_real_state_category}\n\
-                  pages : {number_page}\n\
-                  ", end="\r", flush=True)
 
             while page.status_code != 200:
                 time.sleep(10)
@@ -71,3 +65,5 @@ for x in type_estate:
 # Commit changes to database and close connection
 conn.commit()
 conn.close()
+
+print ('DONE')

@@ -65,45 +65,22 @@
 
       var mymap = L.map('map').setView([38.736946, -9.142685], 6);
       var myResults = <%= results.to_json.html_safe %>;
+      console.log(myResults)
+
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
        attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
        maxZoom: 18
       }).addTo(mymap);
 
+      var distritosData, concelhosData, freguesiasData;
 
-      var distritosData = L.geoJSON(null, {onEachFeature: onDistritoClick}); 
-      var concelhosData = L.geoJSON(null, {onEachFeature: onConcelhoClick, style: { visibility: "hidden" }});
-      var freguesiasData = L.geoJSON(null, { style: { visibility: "hidden" }});
-    
+      distritosData = L.geoJSON(null, {}); 
+      concelhosData = L.geoJSON(null, {});
+      freguesiasData = L.geoJSON(null, {});
+
       // Get the table body element
       var tableBody = document.getElementById("distritosTableBody");
-
-      function onDistritoClick(feature, layer) {
-          layer.on('click', function() {
-          // zoom to the clicked feature
-          mymap.fitBounds(layer.getBounds());
-        
-          // hide the distrito layer
-          distritosData.setStyle({ visibility: "hidden" });
-        
-          // show the concelho layer
-          concelhosData.setStyle({ visibility: "visible" });
-        });
-      }
-
-      function onConcelhoClick(feature, layer) {
-        layer.on('click', function() {
-        // zoom to the clicked feature
-        mymap.fitBounds(layer.getBounds());
-        
-        // hide the concelho layer
-        concelhosData.setStyle({ visibility: "hidden" });
-        
-        // show the freguesia layer
-        freguesiasData.setStyle({ visibility: "visible" });
-        });
-      }
 
 
       // Define combined function for style and event listeners
@@ -160,27 +137,6 @@
 
       function paintlayer(result_map, typeLayer, layer, typefeature, averagePrice_a, averagePrice_c){
         
-        if(typeLayer == "distrito"){ 
-          var row = document.createElement("tr");
-          var distritoCell = document.createElement("td");
-          var averagePriceAlugarCell = document.createElement("td");
-          var averagePriceComprarCell = document.createElement("td");
-          var averagePriceCell = document.createElement("td");
-          var valueCell = document.createElement("td");
-          var areaCell_a = document.createElement("td");
-          var areaCell_c = document.createElement("td");
-          distritoCell.textContent = typefeature;
-          averagePriceAlugarCell.textContent = averagePrice_a;
-          averagePriceComprarCell.textContent = averagePrice_c;
-          valueCell.textContent = result_map;
-          row.appendChild(distritoCell);
-          row.appendChild(averagePriceAlugarCell);
-          row.appendChild(averagePriceComprarCell);
-          row.appendChild(valueCell);
-          row.appendChild(areaCell_a);
-          row.appendChild(areaCell_c);
-          tableBody.appendChild(row);
-        }
 
         if (result_map === null) {
           result_map = 0;
@@ -251,7 +207,7 @@
 
       
       var selectedType = "RentBuym2"
-  
+
       loadGeoJSONData(distritosData, "geojson/ContinenteDistritos.geojson", "distrito", selectedType);
       loadGeoJSONData(concelhosData, "geojson/ContinenteConcelhos.geojson", "concelho", selectedType);
       loadGeoJSONData(freguesiasData, "geojson/ContinenteFreguesias.geojson", "freguesia", selectedType);

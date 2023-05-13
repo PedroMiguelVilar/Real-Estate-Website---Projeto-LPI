@@ -1,6 +1,8 @@
 import sqlite3
 import os
 
+print("#4 python")
+
 # Connect to the first database
 db1 = sqlite3.connect('db_new.sqlite3')
 
@@ -25,3 +27,6 @@ db2.close()
 
 os.remove("db_new.sqlite3")
 os.remove("houses.sqlite3")
+os.remove("values_places.json")
+
+print ('DONE')

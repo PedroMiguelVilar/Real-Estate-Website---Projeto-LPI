@@ -88,6 +88,11 @@ GEM
     debug (1.7.1)
       irb (>= 1.5.0)
       reline (>= 0.3.1)
+    delayed_job (4.1.11)
+      activesupport (>= 3.0, < 8.0)
+    delayed_job_active_record (4.1.7)
+      activerecord (>= 3.0, < 8.0)
+      delayed_job (>= 3.0, < 5)
     erubi (1.12.0)
     globalid (1.1.0)
       activesupport (>= 5.0)
@@ -102,8 +107,6 @@ GEM
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    jvectormap-rails (2.0.0)
-      railties (>= 3.1)
     leaflet-rails (1.9.3)
       rails (>= 4.2.0)
     loofah (2.19.1)
@@ -221,9 +224,9 @@ DEPENDENCIES
   bootsnap
   capybara
   debug
+  delayed_job_active_record
   importmap-rails
   jbuilder
-  jvectormap-rails
   leaflet-rails
   nokogiri
   puma (~> 5.0)

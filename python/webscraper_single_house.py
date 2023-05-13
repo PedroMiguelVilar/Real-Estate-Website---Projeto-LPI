@@ -4,6 +4,8 @@ import time
 import sqlite3
 import os
 
+print("#2 python")
+
 # specify the path of the directory you want to create
 directory_path = "html_sapo"
 directory_path_old = "html_sapo/old"
@@ -28,11 +30,7 @@ headers = {
 for link in links:
     link = link[0]
 
-    print(link)
-
     response = requests.get(link, headers=headers)
-
-    print(' [' + str(response.status_code) + ']')
 
     # Parse the HTML content of the page
     soup = BeautifulSoup(response.content, "html.parser")
@@ -58,3 +56,6 @@ for link in links:
     with open('html_sapo/%s.html' % name, 'w', encoding='utf-8') as f:
         # Write data to the file
         f.write(str(tag))
+
+conn.close()
+print('DONE')

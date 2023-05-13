@@ -74,5 +74,6 @@ gem 'will_paginate', '~> 3.3.0'
 gem 'leaflet-rails'
 gem 'nokogiri'
 gem 'bcrypt', '~> 3.1.7'
+gem 'delayed_job_active_record'
 
 end

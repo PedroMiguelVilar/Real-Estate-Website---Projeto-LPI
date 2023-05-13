@@ -5,6 +5,9 @@ import re
 import sqlite3
 import json
 import os
+from geopy.geocoders import Nominatim
+
+print("#3 python")
 
 divisoes = {
     'Alpendre: ',
@@ -92,7 +95,6 @@ for filename in txt_files:
         latitude = ""
         longitude= ""
 
-        print(filename)
 
         substrings = []
         words = filename.split('-')
@@ -204,12 +206,22 @@ for filename in txt_files:
 
         script = soup.find('script', type='application/ld+json').text
         script_json = json.loads(script)
-        latitude = script_json['availableAtOrFrom']['geo']['latitude']
-        longitude = script_json['availableAtOrFrom']['geo']['longitude']
         category = script_json['category']
         category=category.lower()
 
-        
+
+        if location is not None:
+            # Create a geolocator object using Nominatim
+            geolocator = Nominatim(user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')
+            location_2 = geolocator.geocode(location)
+
+            if location_2 is not None:
+                latitude = location_2.latitude
+                longitude = location_2.longitude
+            else:
+                latitude = None
+                longitude = None 
+
         if price and (area_bruta or area_util):
             if " / " in price:
                 price = price.split(" / ")[0]
@@ -246,10 +258,9 @@ for filename in txt_files:
     
     conn.execute('INSERT INTO houses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? ,? ,?)', data_row)
     # Commit changes to database and close connection
-    conn.commit()
     id_houses+=1
 
-   
+conn.commit()
 conn.close()
 shutil.rmtree(directory)
-print("Done!")
+print("DONE")
