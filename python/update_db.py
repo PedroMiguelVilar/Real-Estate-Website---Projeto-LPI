@@ -27,6 +27,5 @@ db2.close()
 
 os.remove("db_new.sqlite3")
 os.remove("houses.sqlite3")
-os.remove("values_places.json")
 
 print ('DONE')

@@ -12,7 +12,7 @@ no_results = False
 
 # Variables
 type_estate = {'moradias'}
-type_selling = {'alugar'}
+type_selling = {'alugar', 'comprar'}
 
 # Establish connection to database
 conn = sqlite3.connect('houses.sqlite3')

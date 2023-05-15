@@ -35,7 +35,7 @@ Rails.application.routes.draw do
   post '/property-grid/:id/save_search', to: 'house#save_search', as: 'save_search'
   delete '/property-grid/:id/delete_search', to: 'house#delete_search', as: 'delete_search'
 
-  get '/map_districts', to: 'house#map_districts'
+  get '/map_districts', to: 'house#map_districts', as: 'map_districts'
 
   get '/scripts', to: 'scripts#index'
   post '/scripts/run', to: 'scripts#run_script', as: :run_script
