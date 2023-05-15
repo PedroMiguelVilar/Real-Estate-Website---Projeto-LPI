@@ -50,8 +50,10 @@ class UsersController < ApplicationController
       redirect_to login_path, alert: "You must be logged in to access this page"
     end
   end
+
   def create
     @user = User.new(user_params)
+    @user.role = 'cliente'
     if @user.save
       session[:user_id] = @user.id
       redirect_to index_path, notice: "Thanks for signing up!"

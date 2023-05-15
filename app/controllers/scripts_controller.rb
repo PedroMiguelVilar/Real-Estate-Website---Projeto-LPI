@@ -1,6 +1,14 @@
 class ScriptsController < ApplicationController
+  before_action :authorize_admin
   def index
     render :dashboard
+  end
+
+
+  def authorize_admin
+    unless current_user && current_user.role == 'admin'
+      redirect_to root_path, alert: 'Access denied.'
+    end
   end
 
   def run_script
@@ -24,3 +32,4 @@ class ScriptsController < ApplicationController
     end
   end
 end
+  

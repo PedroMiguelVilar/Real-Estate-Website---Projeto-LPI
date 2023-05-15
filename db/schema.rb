@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_11_035029) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_15_204834) do
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
@@ -35,7 +35,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_035029) do
     t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
-  create_table "houses", primary_key: "Id", force: :cascade do |t|
+  create_table "houses", id: false, force: :cascade do |t|
+    t.integer "Id"
     t.string "Url", limit: 196
     t.string "Id_link", limit: 36
     t.string "Type", limit: 12
@@ -50,7 +51,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_035029) do
     t.string "Longitude", limit: 19
     t.string "Area_Util", limit: 7
     t.string "Area_Bruta", limit: 7
-    t.decimal "Price_per_Area"
+    t.decimal "Price_per_Area", precision: 10, scale: 2
     t.integer "Ano_de_Construcao"
     t.string "Data_Publicacao", limit: 17
     t.integer "Alpendre"
@@ -122,6 +123,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_11_035029) do
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "role"
   end
 
   add_foreign_key "favorites", "houses"

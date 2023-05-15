@@ -168,6 +168,9 @@
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="/users/<%= session[:user_id] %>/favourites">Favorites</a>
                 <a class="dropdown-item" href="/users/<%= session[:user_id] %>/searches">Searches</a>
+                <% if current_user && current_user.role == 'admin' %>
+                  <a class="dropdown-item" href="/scripts">Update DB</a>
+                <% end %>
               </div>
             </li>
           </li>
