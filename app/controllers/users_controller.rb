@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
 
-
+  
+  
   helper_method :sort_column, :sort_direction
   def favorites
     if current_user && current_user.id == params[:id].to_i
@@ -22,8 +23,6 @@ class UsersController < ApplicationController
   end
   
   
-
-
 
   def new
       @user = User.new
@@ -61,6 +60,39 @@ class UsersController < ApplicationController
       render :new
     end
   end
+  
+  before_action :require_admin, only: [:index, :update_selected_roles]
+
+  def index
+    @users = User.paginate(page: params[:page], per_page: 10)
+  end
+
+  def update_selected_roles
+    selected_user_ids = params[:selected_users]
+    new_role = params[:role]
+  
+    if selected_user_ids.present?
+      # Check if any of the selected users are admins
+      if User.where(id: selected_user_ids, role: 'admin').exists? || (selected_user_ids.include?(current_user.id.to_s) && new_role == 'cliente')
+        redirect_to users_index_path, alert: "Cannot demote an admin user or yourself."
+        return
+      end
+  
+      User.where(id: selected_user_ids).update_all(role: new_role)
+      redirect_to users_index_path, notice: "Roles updated successfully."
+    else
+      redirect_to users_index_path, alert: "No users selected."
+    end
+  end
+
+  private
+
+  def require_admin
+    unless current_user && current_user.role == 'admin'
+      redirect_to root_path, alert: "Access denied."
+    end
+  end
+
     
   
   private

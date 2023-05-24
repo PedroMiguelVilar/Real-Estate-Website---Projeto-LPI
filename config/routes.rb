@@ -41,5 +41,10 @@ Rails.application.routes.draw do
   post '/scripts/run', to: 'scripts#run_script', as: :run_script
   
 
+  get '/users/index', to: 'users#index', as: 'users_index' 
+  patch '/users/update_selected_roles', to: 'users#update_selected_roles', as: 'update_selected_roles_users'
+
+
+
 
 end

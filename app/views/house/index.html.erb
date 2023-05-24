@@ -73,6 +73,9 @@
                 <% if current_user && current_user.role == 'admin' %>
                   <a class="dropdown-item" href="/scripts">Update DB</a>
                 <% end %>
+                 <% if current_user && current_user.role == 'admin' %>
+                  <a class="dropdown-item" href="/users/index">Update Users</a>
+                <% end %>
                 </div>
               </li>
             </li>
