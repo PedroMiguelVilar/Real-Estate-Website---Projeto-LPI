@@ -4,10 +4,9 @@ class CreateUsers < ActiveRecord::Migration[7.0]
       t.string :name
       t.string :email
       t.string :password_digest
+      t.string :role
 
       t.timestamps
-        # Other attribute definitions
-      attr_accessor :role
     end
   end
 end

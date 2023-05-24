@@ -23,10 +23,7 @@ class ScriptsController < ApplicationController
   class ScriptRunner < Struct.new(:controller, :args)
     def perform
       # Execute your Python script using the system method
-      system("python #{Rails.root}/python/web_scraper_houses.py")
-      system("python #{Rails.root}/python/webscraper_single_house.py")
-      system("python #{Rails.root}/python/body_sapo.py")
-      system("python #{Rails.root}/python/update_db.py")
+
       system("python #{Rails.root}/python/map_districts.py")
       Process.kill('INT', Process.pid)
     end

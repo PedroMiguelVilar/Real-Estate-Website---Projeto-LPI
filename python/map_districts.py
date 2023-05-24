@@ -161,10 +161,18 @@ new_houses = db2.execute('SELECT * FROM houses').fetchall()
 # Define an empty dictionary to store the results
 results = []
 
+# Define a set to keep track of processed locations
+processed_locations = set()
+
 # Iterate over the new houses and process each one
 for house in new_houses:
     # Access the values of each column using indexing
     localization = house[10]
+
+        # Check if the location has already been processed
+    if localization in processed_locations:
+        continue  # Skip this location
+
     parts = localization.split(',')
     reversed_parts = list(reversed(parts))  # Reverse the order of the list and create a new list
     distrito = reversed_parts[0]
@@ -209,6 +217,10 @@ for house in new_houses:
 
     # Append the result to the list of results
     results.append(result)
+
+        
+    # Add the location to the set of processed locations
+    processed_locations.add(localization)
 
 
 db2.close()
@@ -255,9 +267,9 @@ r2_values = [result['results_valuesR2'] for result in results]
 average_R2 = sum(r2_values) / len(r2_values) if r2_values else 0
 
 # Apply scaling based on the averages
-b2r2_scaling = 10 if average_B2R2 < 0.1 else (0.1 if average_B2R2 > 1 else 1)
-b2_scaling = 10 if average_B2 < 0.1 else (0.1 if average_B2 > 1 else 1)
-r2_scaling = 10 if average_R2 < 0.1 else (0.1 if average_R2 > 1 else 1)
+b2r2_scaling = 10 if average_B2R2 < 0.1 else (0.1 if average_B2R2 > 2 else 1)
+b2_scaling = 10 if average_B2 < 0.1 else (0.1 if average_B2 > 2 else 1)
+r2_scaling = 10 if average_R2 < 0.1 else (0.1 if average_R2 > 2 else 1)
 
 for result in results:
     result['results_valuesRB2'] *= b2r2_scaling

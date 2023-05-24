@@ -11,7 +11,7 @@ first_time = True
 no_results = False
 
 # Variables
-type_estate = {'moradias'}
+type_estate = {'moradias', 'apartamentos'}
 type_selling = {'alugar', 'comprar'}
 
 # Establish connection to database

@@ -162,6 +162,9 @@
           <li class="nav-item">
             <a class="nav-link" href="contact.html">Contact</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="map_districts.html">Dados</a>
+          </li>
           <li class="nav-item dropdown">
               <li class="nav-item">
                 <% if session[:user_id] %>
@@ -291,7 +294,7 @@
                   <%end%>
                 </div>
               </div>
-              <div class="property-summary">
+              <div class="property-summary" style="font-size: 11px;">
                 <div class="row">
                   <div class="col-sm-12">
                     <div class="title-box-d section-t4">
@@ -321,30 +324,57 @@
                         <span>Comprar</span>
                       <%end%>
                     </li>
-                    <% if @averages_single.present? %>
-                      <li class="d-flex justify-content-between">
-                        <strong>Preço Médio da Localização:</strong>
-                        <span><%= @averages_single%> €</span>
-                      </li>
+
+                    <% if @house.Situacao == 'alugar' %>
+                        <% if @averages_alugar_distrito.present? %>
+                          <li class="d-flex justify-content-between">
+                            <strong>Preço Médio do Distrito:</strong>
+                            <span><%= @averages_alugar_distrito%> €</span>
+                          </li>
+                        <%end%>
+                      <% elsif @house.Situacao == 'comprar' %>
+                        <% if @averages_comprar_distrito.present? %>
+                          <li class="d-flex justify-content-between">
+                            <strong>Preço Médio do Distrito:</strong>
+                            <span><%= @averages_comprar_distrito%> €</span>
+                          </li>
+                        <%end%>
                     <%end%>
-                    <% if @averages_comprar_distrito.present? %>
-                      <li class="d-flex justify-content-between">
-                        <strong>Preço Médio do Distrito:</strong>
-                        <span><%= @averages_comprar_distrito%> €</span>
-                      </li>
+
+
+                     <% if @house.Situacao == 'alugar' %>
+                        <% if @averages_alugar_concelho.present? %>
+                          <li class="d-flex justify-content-between">
+                            <strong>Preço Médio do Concelho:</strong>
+                            <span><%= @averages_alugar_concelho%> €</span>
+                          </li>
+                        <%end%>
+                      <% elsif @house.Situacao == 'comprar' %>
+                        <% if @averages_comprar_concelho.present? %>
+                          <li class="d-flex justify-content-between">
+                            <strong>Preço Médio do Concelho:</strong>
+                            <span><%= @averages_comprar_concelho%> €</span>
+                          </li>
+                        <%end%>
                     <%end%>
-                    <% if @averages_comprar_concelho.present? %>
-                      <li class="d-flex justify-content-between">
-                        <strong>Preço Médio do Concelho:</strong>
-                        <span><%= @averages_comprar_concelho%> €</span>
-                      </li>
+
+                     <% if @house.Situacao == 'alugar' %>
+                        <% if @averages_alugar_freguesia.present? %>
+                          <li class="d-flex justify-content-between">
+                            <strong>Preço Médio do Freguesia:</strong>
+                            <span><%= @averages_alugar_freguesia%> €</span>
+                          </li>
+                        <%end%>
+                      <% elsif @house.Situacao == 'comprar' %>
+                        <% if @averages_comprar_freguesia.present? %>
+                          <li class="d-flex justify-content-between">
+                            <strong>Preço Médio do Freguesia:</strong>
+                            <span><%= @averages_comprar_freguesia%> €</span>
+                          </li>
+                        <%end%>
                     <%end%>
-                    <% if @averages_comprar_freguesia.present? %>
-                      <li class="d-flex justify-content-between">
-                        <strong>Preço Médio da Freguesia:</strong>
-                        <span><%= @averages_comprar_freguesia%> €</span>
-                      </li>
-                    <%end%>
+
+
                     <% if @price_per_Area.present? %>
                       <li class="d-flex justify-content-between">
                         <strong>Preço/Area:</strong>
@@ -659,21 +689,21 @@
             <% if current_user %>
               <link rel="stylesheet" href="/css/heart.css">
               <% if !current_user.favorite_houses.include?(@house) %>
-                <%= form_tag favorite_house_path(@house), method: :post, id: "favorite-form-#{@house.id}" do %>
-                  <div class="click" id="click-<%= @house.id %>">
-                    <span class="fa fa-heart-o" id="heart-<%= @house.id %>" onclick="document.getElementById('favorite-form-<%= @house.id %>').submit();"></span>
-                    <div class="ring" id="ring-<%= @house.id %>"></div>
-                    <div class="ring2" id="ring2-<%= @house.id %>"></div>
-                    <p class="info" id="info-<%= @house.id %>">Added to favorites!</p>
+                <%= form_tag favorite_house_path(@house), method: :post, id: "favorite-form-#{@house.Id}" do %>
+                  <div class="click" id="click-<%= @house.Id %>">
+                    <span class="fa fa-heart-o" id="heart-<%= @house.Id %>" onclick="document.getElementById('favorite-form-<%= @house.Id %>').submit();"></span>
+                    <div class="ring" id="ring-<%= @house.Id %>"></div>
+                    <div class="ring2" id="ring2-<%= @house.Id %>"></div>
+                    <p class="info" id="info-<%= @house.Id %>">Added to favorites!</p>
                   </div>
                 <% end %>
               <% else %>
-                <%= form_tag unfavorite_house_path(@house), method: :delete, id: "unfavorite-form-#{@house.id}" do %>
-                  <div class="click click active active-2 active-3" id="click-<%= @house.id %>" onclick="document.getElementById('unfavorite-form-<%= @house.id %>').submit();">
-                    <span class="fa fa-heart" id="heart-<%= @house.id %>"></span>
-                    <div class="ring" id="ring-<%= @house.id %>"></div>
-                    <div class="ring2" id="ring2-<%= @house.id %>"></div>
-                    <p class="info" id="info-<%= @house.id %>">Removed from favorites!</p>
+                <%= form_tag unfavorite_house_path(@house), method: :delete, id: "unfavorite-form-#{@house.Id}" do %>
+                  <div class="click click active active-2 active-3" id="click-<%= @house.Id %>" onclick="document.getElementById('unfavorite-form-<%= @house.Id %>').submit();">
+                    <span class="fa fa-heart" id="heart-<%= @house.Id %>"></span>
+                    <div class="ring" id="ring-<%= @house.Id %>"></div>
+                    <div class="ring2" id="ring2-<%= @house.Id %>"></div>
+                    <p class="info" id="info-<%= @house.Id %>">Removed from favorites!</p>
                   </div>
                 <% end %>
               <% end %>
@@ -681,6 +711,45 @@
             <% end %>
           </div>
         </div>
+
+       <% if @house.Situacao === 'comprar' %>
+        <div style="text-align: center;">
+          <span>
+            <div id="time"></div>
+            <div id="averagePlace"></div>
+          </span>
+          <input type="range" id="slider" min="1" max="5000" step="1" value="<%= @averages_alugar_freguesia || @averages_alugar_concelho || @averages_alugar_distrito || 0 %>" oninput="updateAverage()">
+        </div>
+        <%end%>
+
+        <script>
+          function updateAverage() {
+            var sliderValue = document.getElementById("slider").value;
+            document.getElementById("averagePlace").innerHTML = "Average Rent Location: " + sliderValue;
+        
+            // Update the value of average_place_a
+            average_place_a = sliderValue;
+        
+            // Recalculate time and update the display
+            var time = 0;
+            var average_place = house.Price;
+        
+            while (average_place > 0) {
+              average_place -= average_place_a;
+              time++;
+            }
+        
+            var years = Math.floor(time / 12);
+            var months = time % 12;
+        
+            document.getElementById("time").innerHTML = "Time: " + years + " years, " + months + " months";
+          }
+        </script>
+
+
+        <br>
+             
+
         <% if @house.Latitude.present? && @house.Longitude.present? && %>
           <div class="col-md-10 offset-md-1">
             <ul class="nav nav-pills-a nav-pills mb-3 section-t3" id="pills-tab" role="tablist">
@@ -695,6 +764,7 @@
                 height: 600px;
               }
             </style>
+
             <div id="map"></div>
             <%= javascript_include_tag 'leaflet' %>
             <div class="tab-content" id="pills-tabContent">
@@ -1004,7 +1074,40 @@
 
       var popupContent = "<a href='" + house.Url + "'>" + house.Title + "</a>";
       marker.bindPopup(popupContent).addTo(mymap);
-  </script>
+
+      if (house.Situacao == "comprar") {
+        var averagesAlugarFreguesia = <%= @averages_alugar_freguesia || 0 %>;
+        var averagesAlugarConcelho = <%= @averages_alugar_concelho || 0 %>;
+        var averagesAlugarDistrito = <%= @averages_alugar_distrito || 0 %>;
+        var averagesComprarFreguesia = <%= @averages_comprar_freguesia || 0 %>;
+        var averagesComprarConcelho = <%= @averages_comprar_concelho || 0 %>;
+        var averagesComprarDistrito = <%= @averages_comprar_distrito || 0 %>;
+
+        if (averagesComprarFreguesia != 0 && averagesAlugarFreguesia != 0) {
+          average_place_a = averagesAlugarFreguesia;
+        } else if (averagesComprarConcelho != 0 && averagesAlugarConcelho != 0) {
+          average_place_a = averagesAlugarConcelho;
+        } else {
+          average_place_a = averagesAlugarDistrito;
+        }
+
+        var time = 0;
+        var average_place = house.Price;
+
+        while (average_place > 0) {
+          average_place -= average_place_a;
+          time++;
+        }
+
+        var years = Math.floor(time / 12);
+        var months = time % 12;
+
+        document.getElementById("time").innerHTML = "Average Rent Location: " + average_place_a + "<br>" + "Time: " + years + " years, " + months + " months";
+      }
+
+      
+
+</script>
   <script>
     $('#advanced-options').hide();
     // toggle advanced options
@@ -1017,11 +1120,11 @@
     });
 
 
-    var heart = document.getElementById('heart-<%= @house.id %>');
-    var click = document.getElementById('click-<%= @house.id %>');
-    var ring = document.getElementById('ring-<%= @house.id %>');
-    var ring2 = document.getElementById('ring2-<%= @house.id %>');
-    var info = document.getElementById('info-<%= @house.id %>');
+    var heart = document.getElementById('heart-<%= @house.Id %>');
+    var click = document.getElementById('click-<%= @house.Id %>');
+    var ring = document.getElementById('ring-<%= @house.Id %>');
+    var ring2 = document.getElementById('ring2-<%= @house.Id %>');
+    var info = document.getElementById('info-<%= @house.Id %>');
 
     click.addEventListener('click', function() {
       if (heart.classList.contains("fa-heart")) {

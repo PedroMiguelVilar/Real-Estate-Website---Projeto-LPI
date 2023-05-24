@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_15_204834) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_11_035029) do
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
@@ -35,8 +35,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_15_204834) do
     t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
-  create_table "houses", id: false, force: :cascade do |t|
-    t.integer "Id"
+  create_table "houses", primary_key: "Id", force: :cascade do |t|
     t.string "Url", limit: 196
     t.string "Id_link", limit: 36
     t.string "Type", limit: 12
@@ -47,11 +46,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_15_204834) do
     t.integer "Price"
     t.string "Certifacao_Energética", limit: 18
     t.string "Localizacao", limit: 131
-    t.string "Latitude", limit: 18
-    t.string "Longitude", limit: 19
-    t.string "Area_Util", limit: 7
-    t.string "Area_Bruta", limit: 7
-    t.decimal "Price_per_Area", precision: 10, scale: 2
+    t.decimal "Latitude"
+    t.decimal "Longitude"
+    t.decimal "Area_Util"
+    t.decimal "Area_Bruta"
+    t.decimal "Price_per_Area"
     t.integer "Ano_de_Construcao"
     t.string "Data_Publicacao", limit: 17
     t.integer "Alpendre"
@@ -76,7 +75,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_15_204834) do
     t.integer "Despensas"
     t.integer "Hall_de_Entrada"
     t.integer "Kitchenet"
-    t.string "Lavandaria", limit: 5
+    t.integer "Lavandaria"
     t.integer "Número_de_pisos"
     t.integer "Outras_Salas"
     t.integer "Salas"
@@ -121,11 +120,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_15_204834) do
     t.string "name"
     t.string "email"
     t.string "password_digest"
+    t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "role"
   end
 
-  add_foreign_key "favorites", "houses"
+  add_foreign_key "favorites", "houses", primary_key: "Id", on_delete: :cascade
   add_foreign_key "favorites", "users"
 end

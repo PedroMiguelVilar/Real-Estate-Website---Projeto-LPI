@@ -70,44 +70,56 @@ class HouseController < ApplicationController
       
       calculate_area_price
 
-      if @house.Situacao == 'alugar'
 
-        localization = @house.Localizacao
-        parts = localization.split(',').map(&:strip).reverse
-        distrito = parts[0]
-        concelho = parts[1]
-        freguesia = parts[2]
-        
-        @averages_comprar_distrito = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price).round(2)
-        @averages_comprar_concelho = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price).round(2)
-        @averages_comprar_freguesia = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price).round(2)
-        
-        averages_alugar = House.where(situacao: 'alugar').group(:Localizacao).average(:Price)
-        averages_alugar.each do |location, average_price|
-          if @house.Localizacao == location
-            @averages_single = average_price.round(2)
-          end
-        end
-      elsif @house.Situacao == 'comprar'
-
-        localization = @house.Localizacao
-        parts = localization.split(',').map(&:strip).reverse
-        distrito = parts[0]
-        concelho = parts[1]
-        freguesia = parts[2]
-        
-        @averages_comprar_distrito = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price).round(2)
-        @averages_comprar_concelho = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price).round(2)
-        @averages_comprar_freguesia = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price).round(2)
-        
-        averages_comprar = House.where(situacao: 'comprar').group(:Localizacao).average(:Price)
-        averages_comprar.each do |location, average_price|
-          if @house.Localizacao == location
-            @averages_single = average_price.round(2)
-          end
-        end
+      localization = @house.Localizacao
+      parts = localization.split(',').map(&:strip).reverse
+      distrito = parts[0]
+      concelho = parts[1]
+      freguesia = parts[2]
+      
+      if distrito.nil?
+        @averages_comprar_distrito = nil
+      else
+        average_price = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
+        @averages_comprar_distrito = average_price.nil? ? nil : average_price.round(2)
       end
       
+      if concelho.nil?
+        @averages_comprar_concelho = nil
+      else
+        average_price = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
+        @averages_comprar_concelho = average_price.nil? ? nil : average_price.round(2)
+      end
+      
+      if freguesia.nil?
+        @averages_comprar_freguesia = nil
+      else
+        average_price = House.where(situacao: 'comprar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
+        @averages_comprar_freguesia = average_price.nil? ? nil : average_price.round(2)
+      end
+      
+
+      if distrito.nil?
+        @averages_alugar_distrito = nil
+      else
+        average_price = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{distrito}%").average(:Price)
+        @averages_alugar_distrito = average_price.nil? ? nil : average_price.round(2)
+      end
+      
+      if concelho.nil?
+        @averages_alugar_concelho = nil
+      else
+        average_price = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{concelho}%").average(:Price)
+        @averages_alugar_concelho = average_price.nil? ? nil : average_price.round(2)
+      end
+      
+      if freguesia.nil?
+        @averages_alugar_freguesia = nil
+      else
+        average_price = House.where(situacao: 'alugar').where("Localizacao LIKE ?", "%#{freguesia}%").average(:Price)
+        @averages_alugar_freguesia = average_price.nil? ? nil : average_price.round(2)
+      end
+        
     end
     
 

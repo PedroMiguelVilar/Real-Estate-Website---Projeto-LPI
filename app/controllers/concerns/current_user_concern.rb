@@ -9,7 +9,12 @@ module CurrentUserConcern
   
     def set_current_user
       if session[:user_id]
-        @current_user = User.find(session[:user_id])
+        begin
+          @current_user = User.find(session[:user_id])
+        rescue ActiveRecord::RecordNotFound
+          # User with the stored ID does not exist
+          session[:user_id] = nil
+        end
       end
     end
   

@@ -1,1 +1,1 @@
-Delayed::Worker.max_run_time = 86400
+Delayed::Worker.max_run_time = 172800
