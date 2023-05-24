@@ -4,7 +4,9 @@ This is a Ruby on Rails-based website for the real estate market. It allows user
 ## Software Needed
 
 [Ruby](https://www.ruby-lang.org/en/documentation/installation/)
-[Rails]([https://www.ruby-lang.org/en/documentation/installation/](https://rubyonrails.org/))
+[Rails](https://rubyonrails.org/)
+[Python](https://www.python.org/downloads/)
+
 
 
 ## Installation
