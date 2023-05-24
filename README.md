@@ -1,7 +1,7 @@
-#Real Estate Website
+Real Estate Website
 This is a Ruby on Rails-based website for the real estate market. It allows users to browse and search for properties, view property details, and perform various actions related to property listings. The website also includes features for user registration, authentication, and role-based access control.
 
-*Installation
+Installation
 To install and run the Real Estate Website locally, please follow these steps:
 Navigate to the project directory:
 cd Plataforma-Web-master
