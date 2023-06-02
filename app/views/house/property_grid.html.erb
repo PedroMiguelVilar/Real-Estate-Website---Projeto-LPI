@@ -110,22 +110,22 @@
                 <label for="year">Ano Max.</label><%= text_field_tag :max_year, params[:max_year], class: 'form-control form-control-lg form-control-a',placeholder: "Ano Maximo"%>
               </div>
               <div class="form-group">
-                <label for="Acesso_Mobilidade_Reduzida">Acesso Mobilidade Reduzida &nbsp</label><%= select_tag :Acesso_Mobilidade_Reduzida, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Acesso_Mobilidade_Reduzida]), include_blank: true %> <br>
-                <label for="Arrecadação">Arrecadação &nbsp</label><%= select_tag :Arrecadação, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Arrecadação]), include_blank: true %> <br>
-                <label for="Elevador">Elevador &nbsp</label><%= select_tag :Elevador, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Elevador]), include_blank: true %> <br>
-                <label for="Garagem">Garagem &nbsp</label><%= select_tag :Garagem, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Garagem]), include_blank: true %> <br>
-                <label for="Estacionamento">Estacionamento &nbsp</label><%= select_tag :Estacionamento, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Estacionamento]), include_blank: true %> <br>
-                <label for="Jardim">Jardim &nbsp</label><%= select_tag :Jardim, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Jardim]), include_blank: true %> <br>
-                <label for="Lareira">Lareira &nbsp</label><%= select_tag :Lareira, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Lareira]), include_blank: true %> <br>
-                <label for="Recuperador_de_calor">Recuperador de calor &nbsp</label><%= select_tag :Recuperador_de_calor, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Recuperador_de_calor]), include_blank: true %> <br>
-                <label for="Vidros_duplos">Vidros Duplos &nbsp</label><%= select_tag :Vidros_duplos, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Vidros_duplos]), include_blank: true %> <br>
-                <label for="Varanda">Varanda &nbsp</label><%= select_tag :Varanda, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Varanda]), include_blank: true %> <br>
-                <label for="Terraço">Terraço &nbsp</label><%= select_tag :Terraço, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Terraço]), include_blank: true %> <br>
-                <label for="Suite">Suite &nbsp</label><%= select_tag :Suite, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Suite]), include_blank: true %> <br>
-                <label for="Segurança">Segurança &nbsp</label><%= select_tag :Segurança, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Segurança]), include_blank: true %> <br>
-                <label for="Piscina">Piscina &nbsp</label><%= select_tag :Piscina, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Piscina]), include_blank: true %> <br>
-                <label for="Painéis_Solares">Painéis Solares &nbsp</label><%= select_tag :Painéis_Solares, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Painéis_Solares]), include_blank: true %> <br>
-                <label for="Logradouro">Logradouro &nbsp</label><%= select_tag :Logradouro, options_for_select([['Sim', 'TRUE'], ['Nao', 'FALSE']], params[:Logradouro]), include_blank: true %>
+                <label for="Acesso_Mobilidade_Reduzida">Acesso Mobilidade Reduzida &nbsp</label><%= select_tag :Acesso_Mobilidade_Reduzida, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Acesso_Mobilidade_Reduzida]), include_blank: true %> <br>
+                <label for="Arrecadação">Arrecadação &nbsp</label><%= select_tag :Arrecadação, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Arrecadação]), include_blank: true %> <br>
+                <label for="Elevador">Elevador &nbsp</label><%= select_tag :Elevador, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Elevador]), include_blank: true %> <br>
+                <label for="Garagem">Garagem &nbsp</label><%= select_tag :Garagem, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Garagem]), include_blank: true %> <br>
+                <label for="Estacionamento">Estacionamento &nbsp</label><%= select_tag :Estacionamento, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Estacionamento]), include_blank: true %> <br>
+                <label for="Jardim">Jardim &nbsp</label><%= select_tag :Jardim, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Jardim]), include_blank: true %> <br>
+                <label for="Lareira">Lareira &nbsp</label><%= select_tag :Lareira, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Lareira]), include_blank: true %> <br>
+                <label for="Recuperador_de_calor">Recuperador de calor &nbsp</label><%= select_tag :Recuperador_de_calor, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Recuperador_de_calor]), include_blank: true %> <br>
+                <label for="Vidros_duplos">Vidros Duplos &nbsp</label><%= select_tag :Vidros_duplos, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Vidros_duplos]), include_blank: true %> <br>
+                <label for="Varanda">Varanda &nbsp</label><%= select_tag :Varanda, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Varanda]), include_blank: true %> <br>
+                <label for="Terraço">Terraço &nbsp</label><%= select_tag :Terraço, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Terraço]), include_blank: true %> <br>
+                <label for="Suite">Suite &nbsp</label><%= select_tag :Suite, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Suite]), include_blank: true %> <br>
+                <label for="Segurança">Segurança &nbsp</label><%= select_tag :Segurança, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Segurança]), include_blank: true %> <br>
+                <label for="Piscina">Piscina &nbsp</label><%= select_tag :Piscina, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Piscina]), include_blank: true %> <br>
+                <label for="Painéis_Solares">Painéis Solares &nbsp</label><%= select_tag :Painéis_Solares, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Painéis_Solares]), include_blank: true %> <br>
+                <label for="Logradouro">Logradouro &nbsp</label><%= select_tag :Logradouro, options_for_select([['Sim', '1'], ['Nao', '0']], params[:Logradouro]), include_blank: true %>
               </div>
             </ul>
           </div>
@@ -143,7 +143,7 @@
         <span></span>
         <span></span>
       </button>
-      <a class="navbar-brand text-brand" href="index.html">SellHigh <span class="color-b">BuyLow</span></a>
+      <a class="navbar-brand text-brand" href="index.html">Invest <span class="color-b">RealEstate</span></a>
       <button type="button" class="btn btn-link nav-search navbar-toggle-box-collapse d-md-none" data-toggle="collapse"
         data-target="#navbarTogglerDemo01" aria-expanded="false">
         <span class="fa fa-search" aria-hidden="true"></span>

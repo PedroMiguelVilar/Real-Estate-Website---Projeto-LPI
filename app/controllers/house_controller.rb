@@ -66,6 +66,7 @@ class HouseController < ApplicationController
     def property_single
       id = params[:format]
       @house = House.find(id)    
+      puts @house.inspect
       @image_urls = PagesController.new.scrape_single(@house)
       
       calculate_area_price
